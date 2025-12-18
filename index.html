@@ -1762,12 +1762,12 @@
         startBreathing();
 
         // ============================================
-        // VIEW COUNTER (CountAPI)
+        // VIEW COUNTER
         // ============================================
-        fetch('https://api.countapi.xyz/hit/breathe-zen-orb/visits')
+        fetch('https://api.counterapi.dev/v1/breathe-zen/visits/up')
             .then(res => res.json())
             .then(data => {
-                document.getElementById('viewCount').textContent = data.value.toLocaleString();
+                document.getElementById('viewCount').textContent = data.count.toLocaleString();
             })
             .catch(() => {
                 document.querySelector('.footer').style.display = 'none';
