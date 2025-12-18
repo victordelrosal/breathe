@@ -154,10 +154,10 @@
 
         @keyframes breathe {
             0%, 100% {
-                scale: 1.3;
+                scale: 1.8;
             }
             40% {
-                scale: 0.8;
+                scale: 0.5;
             }
         }
 
@@ -171,23 +171,48 @@
             box-shadow: 0 0 6px 1px currentColor;
         }
 
-        /* Breathing text */
+        /* Breathing text - cinema subtitle style */
         .breath-text {
-            position: absolute;
-            font-size: 24px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            color: var(--text-color);
-            text-transform: uppercase;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            position: fixed;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-align: center;
+            text-shadow:
+                2px 2px 0 #000,
+                -2px 2px 0 #000,
+                2px -2px 0 #000,
+                -2px -2px 0 #000,
+                0 2px 0 #000,
+                0 -2px 0 #000,
+                2px 0 0 #000,
+                -2px 0 0 #000,
+                3px 3px 6px rgba(0, 0, 0, 0.8);
             z-index: 10;
             pointer-events: none;
-            opacity: 0.9;
+            opacity: 0.95;
             transition: opacity 0.3s ease;
+            max-width: 80%;
+            line-height: 1.4;
         }
 
         [data-theme="light"] .breath-text {
-            text-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            color: #ffffff;
+            text-shadow:
+                2px 2px 0 #000,
+                -2px 2px 0 #000,
+                2px -2px 0 #000,
+                -2px -2px 0 #000,
+                0 2px 0 #000,
+                0 -2px 0 #000,
+                2px 0 0 #000,
+                -2px 0 0 #000,
+                3px 3px 6px rgba(0, 0, 0, 0.8);
         }
 
         /* Glow effect behind orb */
@@ -207,12 +232,12 @@
 
         @keyframes glowPulse {
             0%, 100% {
-                transform: scale(1.4);
-                opacity: 0.8;
+                transform: scale(2);
+                opacity: 0.9;
             }
             40% {
-                transform: scale(0.9);
-                opacity: 0.5;
+                transform: scale(0.5);
+                opacity: 0.4;
             }
         }
 
@@ -247,7 +272,8 @@
             }
 
             .breath-text {
-                font-size: 18px;
+                font-size: 22px;
+                bottom: 6%;
             }
 
             .orb-glow {
@@ -286,22 +312,48 @@
                 <option value="hu">Magyar</option>
                 <option value="fi">Suomi</option>
                 <option value="he">עברית</option>
+                <option value="uk">Українська</option>
+                <option value="ro">Română</option>
+                <option value="ms">Bahasa Melayu</option>
+                <option value="tl">Filipino</option>
+                <option value="sw">Kiswahili</option>
+                <option value="ta">தமிழ்</option>
+                <option value="ur">اردو</option>
+                <option value="fa">فارسی</option>
+                <option value="mr">मराठी</option>
+                <option value="te">తెలుగు</option>
+                <option value="pa">ਪੰਜਾਬੀ</option>
+                <option value="gu">ગુજરાતી</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="ml">മലയാളം</option>
+                <option value="my">မြန်မာ</option>
+                <option value="am">አማርኛ</option>
+                <option value="ne">नेपाली</option>
+                <option value="si">සිංහල</option>
+                <option value="km">ភាសាខ្មែរ</option>
+                <option value="lo">ລາວ</option>
+                <option value="ka">ქართული</option>
+                <option value="az">Azərbaycan</option>
+                <option value="uz">O'zbek</option>
+                <option value="kk">Қазақ</option>
+                <option value="sr">Српски</option>
             </select>
         </div>
 
         <div class="nav-group">
             <div class="radio-controls">
                 <select id="station" class="station-select" aria-label="Select music track">
-                    <option value="0">Track 1</option>
-                    <option value="1">Track 2</option>
-                    <option value="2">Track 3</option>
-                    <option value="3">Track 4</option>
+                    <option value="0">Peaceful</option>
+                    <option value="1">Soothing</option>
+                    <option value="2">Zen Garden</option>
+                    <option value="3">Ambient</option>
                 </select>
                 <button id="radioBtn" class="radio-btn" aria-label="Play/Stop music">
                     <span id="radioIcon">▶</span>
                     <span id="radioText">Play</span>
                 </button>
             </div>
+            <button id="silentToggle" class="theme-toggle" aria-label="Toggle silent mode" title="Silent mode">💬</button>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
         </div>
     </nav>
@@ -309,8 +361,9 @@
     <div class="orb-container">
         <div class="orb-glow" id="orbGlow"></div>
         <div class="wrap" id="wrap"></div>
-        <div class="breath-text" id="breathText">Breathe In</div>
     </div>
+
+    <div class="breath-text" id="breathText">Breathe In</div>
 
     <audio id="radioAudio" preload="none"></audio>
 
@@ -339,23 +392,24 @@
                 const y = Math.random() * 360;
                 const hueOffset = (40 / TOTAL_PARTICLES) * i;
 
-                // Generate keyframes for this particle
+                // Generate keyframes for this particle - stays in orb formation
                 css += `
                     .c:nth-child(${i}) {
                         animation: orbit${i} ${PARTICLE_TIME}s infinite;
                         animation-delay: ${i * 0.01}s;
                     }
                     @keyframes orbit${i} {
-                        20% { opacity: 1; }
-                        30% {
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
+                        0% {
+                            opacity: 0;
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(0) rotateZ(${z}deg);
                         }
-                        80% {
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
+                        15% {
                             opacity: 1;
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
                         }
                         100% {
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE * 3}px) rotateZ(${z}deg);
+                            opacity: 1;
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
                         }
                     }
                 `;
@@ -396,7 +450,7 @@
         updateParticleColors();
         colorCycle();
 
-        // Translations
+        // Translations (50 languages)
         const translations = {
             en: { in: 'Breathe In', out: 'Breathe Out' },
             zh: { in: '吸气', out: '呼气' },
@@ -422,21 +476,47 @@
             sv: { in: 'Andas in', out: 'Andas ut' },
             hu: { in: 'Lélegezz be', out: 'Lélegezz ki' },
             fi: { in: 'Hengitä sisään', out: 'Hengitä ulos' },
-            he: { in: 'שאיפה', out: 'נשיפה' }
+            he: { in: 'שאיפה', out: 'נשיפה' },
+            uk: { in: 'Вдих', out: 'Видих' },
+            ro: { in: 'Inspiră', out: 'Expiră' },
+            ms: { in: 'Tarik Nafas', out: 'Hembus' },
+            tl: { in: 'Huminga', out: 'Ilabas' },
+            sw: { in: 'Vuta Pumzi', out: 'Toa Pumzi' },
+            ta: { in: 'உள்ளிழு', out: 'வெளியிடு' },
+            ur: { in: 'سانس لیں', out: 'سانس چھوڑیں' },
+            fa: { in: 'دم', out: 'بازدم' },
+            mr: { in: 'श्वास घ्या', out: 'श्वास सोडा' },
+            te: { in: 'పీల్చు', out: 'వదులు' },
+            pa: { in: 'ਸਾਹ ਲਓ', out: 'ਸਾਹ ਛੱਡੋ' },
+            gu: { in: 'શ્વાસ લો', out: 'શ્વાસ છોડો' },
+            kn: { in: 'ಉಸಿರು', out: 'ಬಿಡು' },
+            ml: { in: 'ശ്വസിക്കുക', out: 'പുറത്തുവിടുക' },
+            my: { in: 'ရှူ', out: 'ထုတ်' },
+            am: { in: 'ተነፍስ', out: 'አውጣ' },
+            ne: { in: 'सास लिनु', out: 'सास छोड्नु' },
+            si: { in: 'හුස්ම ගන්න', out: 'හුස්ම හරින්න' },
+            km: { in: 'ដកដង្ហើមចូល', out: 'ដកដង្ហើមចេញ' },
+            lo: { in: 'ຫາຍໃຈເຂົ້າ', out: 'ຫາຍໃຈອອກ' },
+            ka: { in: 'ჩაისუნთქე', out: 'ამოისუნთქე' },
+            az: { in: 'Nəfəs al', out: 'Nəfəs ver' },
+            uz: { in: 'Nafas ol', out: 'Nafas chiqar' },
+            kk: { in: 'Дем ал', out: 'Дем шығар' },
+            sr: { in: 'Удахни', out: 'Издахни' }
         };
 
         // Local music tracks
         const tracks = [
-            'music/track1.mp3',
-            'music/track2.mp3',
-            'music/track3.mp3',
-            'music/track4.mp3'
+            'music/relax-meditate-gentle-peaceful-291162.mp3',
+            'music/soothing-meditation-without-voice-315921.mp3',
+            'music/zen-garden-310599.mp3',
+            'music/zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403.mp3'
         ];
 
         // DOM elements
         const breathText = document.getElementById('breathText');
         const languageSelect = document.getElementById('language');
         const themeToggle = document.getElementById('themeToggle');
+        const silentToggle = document.getElementById('silentToggle');
         const radioBtn = document.getElementById('radioBtn');
         const radioIcon = document.getElementById('radioIcon');
         const radioText = document.getElementById('radioText');
@@ -452,31 +532,75 @@
         const EXHALE_DURATION = 6000;
         const TOTAL_CYCLE = INHALE_DURATION + EXHALE_DURATION;
 
-        // Update breath text based on phase
+        // Silent mode: hide text cues
+        let silentMode = localStorage.getItem('silentMode') === 'true';
+
+        // Initialize silent mode UI
+        function updateSilentModeUI() {
+            if (silentMode) {
+                breathText.style.opacity = '0';
+                silentToggle.textContent = '🔇';
+                silentToggle.title = 'Silent mode (on)';
+            } else {
+                breathText.style.opacity = '0.9';
+                silentToggle.textContent = '💬';
+                silentToggle.title = 'Silent mode (off)';
+            }
+        }
+        updateSilentModeUI();
+
+        // Update breath text (respects silent mode)
         function updateBreathText() {
-            const t = translations[currentLang];
-            breathText.textContent = breathingIn ? t.in : t.out;
+            if (!silentMode) {
+                const t = translations[currentLang] || translations.en;
+                breathText.textContent = breathingIn ? t.in : t.out;
+            }
         }
 
-        // Breathing cycle controller
-        function breatheCycle() {
+        // Breathing cycle controller - synced to CSS animation
+        const wrap = document.getElementById('wrap');
+        let exhaleTimeout = null;
+
+        function startBreathCycle() {
+            // Clear any existing timeout
+            if (exhaleTimeout) clearTimeout(exhaleTimeout);
+
+            // Start inhale (orb contracting)
             breathingIn = true;
             updateBreathText();
 
-            setTimeout(() => {
+            // After inhale duration, switch to exhale (orb expanding)
+            exhaleTimeout = setTimeout(() => {
                 breathingIn = false;
                 updateBreathText();
             }, INHALE_DURATION);
         }
 
-        // Start breathing animation
-        breatheCycle();
-        setInterval(breatheCycle, TOTAL_CYCLE);
+        // Sync with CSS animation using animationiteration event
+        wrap.addEventListener('animationiteration', (e) => {
+            if (e.animationName === 'breathe') {
+                startBreathCycle();
+            }
+        });
+
+        // Initial start - sync with CSS animation start
+        startBreathCycle();
 
         // Language change handler
         languageSelect.addEventListener('change', (e) => {
             currentLang = e.target.value;
             updateBreathText();
+        });
+
+        // Silent mode toggle
+        silentToggle.addEventListener('click', () => {
+            silentMode = !silentMode;
+            localStorage.setItem('silentMode', silentMode);
+            updateSilentModeUI();
+            // If turning off silent mode, update text to current phase
+            if (!silentMode) {
+                updateBreathText();
+            }
         });
 
         // Theme toggle
