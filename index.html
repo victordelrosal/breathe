@@ -1111,6 +1111,7 @@
     <div id="hamburgerMenu" class="hamburger-menu hidden">
         <button id="menuCard" class="menu-item">Why Breathe?</button>
         <button id="menuScience" class="menu-item">The Science</button>
+        <button id="menuCreating" class="menu-item">Creating Breathe</button>
         <button id="menuDisclaimer" class="menu-item">Disclaimer & Safety</button>
     </div>
 
@@ -1697,6 +1698,13 @@
 
         menuScience.addEventListener('click', () => {
             openModal(scienceModal);
+        });
+
+        // Creating Breathe link
+        const menuCreating = document.getElementById('menuCreating');
+        menuCreating.addEventListener('click', () => {
+            hamburgerMenu.classList.add('hidden');
+            window.open('https://victordelrosal.com/creating-breathe', '_blank');
         });
 
         // Card overlay
