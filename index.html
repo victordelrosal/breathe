@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Breathing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #0a0a14;
+            --nav-bg: rgba(10, 10, 20, 0.7);
+            --text-color: rgba(255, 255, 255, 0.9);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f0e8;
+            --nav-bg: rgba(240, 240, 232, 0.8);
+            --text-color: rgba(30, 30, 40, 0.9);
+            --text-muted: rgba(30, 30, 40, 0.5);
+            --border-color: rgba(30, 30, 40, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.5s ease;
+            overflow: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar:hover {
+            opacity: 1;
+        }
+
+        .nav-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        select, button {
+            font-family: inherit;
+            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover, button:hover {
+            border-color: var(--text-muted);
+        }
+
+        select:focus, button:focus {
+            outline: none;
+            border-color: var(--text-muted);
+        }
+
+        select option {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .radio-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-btn {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .radio-btn.playing {
+            background: rgba(100, 200, 150, 0.2);
+            border-color: rgba(100, 200, 150, 0.4);
+        }
+
+        .station-select {
+            width: 100px;
+        }
+
+        /* Orb Container */
+        .orb-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 400px;
+            height: 400px;
+        }
+
+        /* Particle Orb Wrapper */
+        .wrap {
+            position: relative;
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            animation: rotate 20s infinite linear, breathe 10s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotateY(360deg) rotateX(360deg);
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                scale: 1.3;
+            }
+            40% {
+                scale: 0.8;
+            }
+        }
+
+        /* Individual particle */
+        .c {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 6px 1px currentColor;
+        }
+
+        /* Breathing text */
+        .breath-text {
+            position: absolute;
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        [data-theme="light"] .breath-text {
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glow effect behind orb */
+        .orb-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle,
+                rgba(139, 92, 246, 0.3) 0%,
+                rgba(6, 182, 212, 0.15) 40%,
+                transparent 70%);
+            filter: blur(40px);
+            pointer-events: none;
+            animation: glowPulse 10s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                transform: scale(1.4);
+                opacity: 0.8;
+            }
+            40% {
+                transform: scale(0.9);
+                opacity: 0.5;
+            }
+        }
+
+        [data-theme="light"] .orb-glow {
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 10px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .nav-group {
+                gap: 8px;
+            }
+
+            select, button {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .station-select {
+                width: 80px;
+            }
+
+            .orb-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .breath-text {
+                font-size: 18px;
+            }
+
+            .orb-glow {
+                width: 220px;
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <nav class="navbar">
+        <div class="nav-group">
+            <select id="language" aria-label="Select language">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="hi">हिन्दी</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="ar">العربية</option>
+                <option value="bn">বাংলা</option>
+                <option value="pt">Português</option>
+                <option value="ru">Русский</option>
+                <option value="ja">日本語</option>
+                <option value="de">Deutsch</option>
+                <option value="ko">한국어</option>
+                <option value="vi">Tiếng Việt</option>
+                <option value="tr">Türkçe</option>
+                <option value="it">Italiano</option>
+                <option value="th">ไทย</option>
+                <option value="pl">Polski</option>
+                <option value="nl">Nederlands</option>
+                <option value="id">Indonesia</option>
+                <option value="el">Ελληνικά</option>
+                <option value="cs">Čeština</option>
+                <option value="sv">Svenska</option>
+                <option value="hu">Magyar</option>
+                <option value="fi">Suomi</option>
+                <option value="he">עברית</option>
+            </select>
+        </div>
+
+        <div class="nav-group">
+            <div class="radio-controls">
+                <select id="station" class="station-select" aria-label="Select music track">
+                    <option value="0">Track 1</option>
+                    <option value="1">Track 2</option>
+                    <option value="2">Track 3</option>
+                    <option value="3">Track 4</option>
+                </select>
+                <button id="radioBtn" class="radio-btn" aria-label="Play/Stop music">
+                    <span id="radioIcon">▶</span>
+                    <span id="radioText">Play</span>
+                </button>
+            </div>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
+        </div>
+    </nav>
+
+    <div class="orb-container">
+        <div class="orb-glow" id="orbGlow"></div>
+        <div class="wrap" id="wrap"></div>
+        <div class="breath-text" id="breathText">Breathe In</div>
+    </div>
+
+    <audio id="radioAudio" preload="none"></audio>
+
+    <script>
+        // Configuration
+        const TOTAL_PARTICLES = 250;
+        const ORB_SIZE = 100;
+        const PARTICLE_TIME = 14;
+        let baseHue = 270; // Start with purple
+
+        // Generate particles and their animations
+        function createParticleOrb() {
+            const wrap = document.getElementById('wrap');
+            const styleSheet = document.createElement('style');
+            let css = '';
+
+            for (let i = 1; i <= TOTAL_PARTICLES; i++) {
+                // Create particle element
+                const particle = document.createElement('div');
+                particle.className = 'c';
+                particle.id = `p${i}`;
+                wrap.appendChild(particle);
+
+                // Random angles for 3D sphere distribution
+                const z = Math.random() * 360;
+                const y = Math.random() * 360;
+                const hueOffset = (40 / TOTAL_PARTICLES) * i;
+
+                // Generate keyframes for this particle
+                css += `
+                    .c:nth-child(${i}) {
+                        animation: orbit${i} ${PARTICLE_TIME}s infinite;
+                        animation-delay: ${i * 0.01}s;
+                    }
+                    @keyframes orbit${i} {
+                        20% { opacity: 1; }
+                        30% {
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
+                        }
+                        80% {
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE * 3}px) rotateZ(${z}deg);
+                        }
+                    }
+                `;
+            }
+
+            styleSheet.textContent = css;
+            document.head.appendChild(styleSheet);
+        }
+
+        // Update particle colors based on hue
+        function updateParticleColors() {
+            const particles = document.querySelectorAll('.c');
+            particles.forEach((particle, i) => {
+                const hue = (baseHue + (40 / TOTAL_PARTICLES) * i) % 360;
+                particle.style.color = `hsl(${hue}, 100%, 60%)`;
+                particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
+            });
+
+            // Update glow
+            const orbGlow = document.getElementById('orbGlow');
+            const hue1 = baseHue;
+            const hue2 = (baseHue + 60) % 360;
+            orbGlow.style.background = `radial-gradient(circle,
+                hsla(${hue1}, 80%, 50%, 0.3) 0%,
+                hsla(${hue2}, 80%, 50%, 0.15) 40%,
+                transparent 70%)`;
+        }
+
+        // Color cycle animation
+        function colorCycle() {
+            baseHue = (baseHue + 0.3) % 360;
+            updateParticleColors();
+            requestAnimationFrame(colorCycle);
+        }
+
+        // Initialize particles
+        createParticleOrb();
+        updateParticleColors();
+        colorCycle();
+
+        // Translations
+        const translations = {
+            en: { in: 'Breathe In', out: 'Breathe Out' },
+            zh: { in: '吸气', out: '呼气' },
+            hi: { in: 'सांस लें', out: 'सांस छोड़ें' },
+            es: { in: 'Inhala', out: 'Exhala' },
+            fr: { in: 'Inspirez', out: 'Expirez' },
+            ar: { in: 'استنشق', out: 'ازفر' },
+            bn: { in: 'শ্বাস নিন', out: 'শ্বাস ছাড়ুন' },
+            pt: { in: 'Inspire', out: 'Expire' },
+            ru: { in: 'Вдох', out: 'Выдох' },
+            ja: { in: '吸って', out: '吐いて' },
+            de: { in: 'Einatmen', out: 'Ausatmen' },
+            ko: { in: '들이쉬세요', out: '내쉬세요' },
+            vi: { in: 'Hít vào', out: 'Thở ra' },
+            tr: { in: 'Nefes Al', out: 'Nefes Ver' },
+            it: { in: 'Inspira', out: 'Espira' },
+            th: { in: 'หายใจเข้า', out: 'หายใจออก' },
+            pl: { in: 'Wdech', out: 'Wydech' },
+            nl: { in: 'Inademen', out: 'Uitademen' },
+            id: { in: 'Tarik Napas', out: 'Hembuskan' },
+            el: { in: 'Εισπνοή', out: 'Εκπνοή' },
+            cs: { in: 'Nádech', out: 'Výdech' },
+            sv: { in: 'Andas in', out: 'Andas ut' },
+            hu: { in: 'Lélegezz be', out: 'Lélegezz ki' },
+            fi: { in: 'Hengitä sisään', out: 'Hengitä ulos' },
+            he: { in: 'שאיפה', out: 'נשיפה' }
+        };
+
+        // Local music tracks
+        const tracks = [
+            'music/track1.mp3',
+            'music/track2.mp3',
+            'music/track3.mp3',
+            'music/track4.mp3'
+        ];
+
+        // DOM elements
+        const breathText = document.getElementById('breathText');
+        const languageSelect = document.getElementById('language');
+        const themeToggle = document.getElementById('themeToggle');
+        const radioBtn = document.getElementById('radioBtn');
+        const radioIcon = document.getElementById('radioIcon');
+        const radioText = document.getElementById('radioText');
+        const stationSelect = document.getElementById('station');
+        const radioAudio = document.getElementById('radioAudio');
+
+        let currentLang = 'en';
+        let isPlaying = false;
+        let breathingIn = true;
+
+        // Breathing cycle: 4s inhale, 6s exhale = 10s total
+        const INHALE_DURATION = 4000;
+        const EXHALE_DURATION = 6000;
+        const TOTAL_CYCLE = INHALE_DURATION + EXHALE_DURATION;
+
+        // Update breath text based on phase
+        function updateBreathText() {
+            const t = translations[currentLang];
+            breathText.textContent = breathingIn ? t.in : t.out;
+        }
+
+        // Breathing cycle controller
+        function breatheCycle() {
+            breathingIn = true;
+            updateBreathText();
+
+            setTimeout(() => {
+                breathingIn = false;
+                updateBreathText();
+            }, INHALE_DURATION);
+        }
+
+        // Start breathing animation
+        breatheCycle();
+        setInterval(breatheCycle, TOTAL_CYCLE);
+
+        // Language change handler
+        languageSelect.addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            updateBreathText();
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', () => {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            themeToggle.textContent = isDark ? '☾' : '☀';
+        });
+
+        // Music controls
+        radioAudio.loop = true; // Loop tracks
+
+        function toggleMusic() {
+            if (isPlaying) {
+                radioAudio.pause();
+                radioAudio.currentTime = 0;
+                isPlaying = false;
+                radioIcon.textContent = '▶';
+                radioText.textContent = 'Play';
+                radioBtn.classList.remove('playing');
+            } else {
+                const trackIndex = parseInt(stationSelect.value);
+                radioAudio.src = tracks[trackIndex];
+                radioAudio.play().catch(e => console.log('Audio play failed:', e));
+                isPlaying = true;
+                radioIcon.textContent = '■';
+                radioText.textContent = 'Stop';
+                radioBtn.classList.add('playing');
+            }
+        }
+
+        radioBtn.addEventListener('click', toggleMusic);
+
+        stationSelect.addEventListener('change', () => {
+            if (isPlaying) {
+                const trackIndex = parseInt(stationSelect.value);
+                radioAudio.src = tracks[trackIndex];
+                radioAudio.play().catch(e => console.log('Audio play failed:', e));
+            }
+        });
+
+        // Handle audio errors gracefully
+        radioAudio.addEventListener('error', () => {
+            console.log('Track unavailable');
+        });
+    </script>
+</body>
+</html>
