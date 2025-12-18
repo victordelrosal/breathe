@@ -213,6 +213,82 @@
             opacity: 0.25;
         }
 
+        /* CRT TV Effect Overlay */
+        .tv-effect {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .tv-effect.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tv-screen {
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            transform: scale(0, 0);
+            box-shadow: 0 0 100px 50px rgba(255, 255, 255, 0.8),
+                        0 0 200px 100px rgba(255, 255, 255, 0.4);
+            filter: blur(2px);
+        }
+
+        /* Turn OFF animation (dark to light) */
+        @keyframes tvTurnOff {
+            0% {
+                transform: scale(1, 1);
+                filter: blur(0px) brightness(1);
+            }
+            30% {
+                transform: scale(1, 0.008);
+                filter: blur(3px) brightness(3);
+            }
+            60% {
+                transform: scale(0.6, 0.005);
+                filter: blur(4px) brightness(4);
+            }
+            100% {
+                transform: scale(0, 0);
+                filter: blur(5px) brightness(2);
+            }
+        }
+
+        /* Turn ON animation (light to dark) */
+        @keyframes tvTurnOn {
+            0% {
+                transform: scale(0, 0);
+                filter: blur(5px) brightness(2);
+            }
+            40% {
+                transform: scale(0.6, 0.005);
+                filter: blur(4px) brightness(4);
+            }
+            70% {
+                transform: scale(1, 0.008);
+                filter: blur(3px) brightness(3);
+            }
+            100% {
+                transform: scale(1, 1);
+                filter: blur(0px) brightness(1);
+            }
+        }
+
+        .tv-screen.turn-off {
+            animation: tvTurnOff 0.4s cubic-bezier(0.4, 0, 0.8, 1) forwards;
+        }
+
+        .tv-screen.turn-on {
+            animation: tvTurnOn 0.4s cubic-bezier(0.2, 0, 0.6, 1) forwards;
+        }
+
         /* Custom Pattern Panel */
         .custom-panel {
             position: fixed;
@@ -670,6 +746,9 @@
 </head>
 <body data-theme="dark">
     <div id="bgLayer" class="bg-layer"></div>
+    <div id="tvEffect" class="tv-effect">
+        <div id="tvScreen" class="tv-screen"></div>
+    </div>
     <nav class="navbar">
         <div class="nav-group">
             <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">☰</button>
@@ -898,6 +977,8 @@
         const customExhale = document.getElementById('customExhale');
         const bgSelect = document.getElementById('bgSelect');
         const bgLayer = document.getElementById('bgLayer');
+        const tvEffect = document.getElementById('tvEffect');
+        const tvScreen = document.getElementById('tvScreen');
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const hamburgerMenu = document.getElementById('hamburgerMenu');
         const disclaimerModal = document.getElementById('disclaimerModal');
@@ -1131,8 +1212,29 @@
         themeToggle.addEventListener('click', () => {
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
-            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            themeToggle.textContent = isDark ? '☾' : '☀';
+
+            // Reset animation classes
+            tvScreen.classList.remove('turn-on', 'turn-off');
+
+            // Show the TV effect overlay
+            tvEffect.classList.add('active');
+
+            // Trigger the appropriate animation
+            // Force reflow to restart animation
+            void tvScreen.offsetWidth;
+            tvScreen.classList.add(isDark ? 'turn-off' : 'turn-on');
+
+            // Change theme at the midpoint of animation (when line is thinnest)
+            setTimeout(() => {
+                body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+                themeToggle.textContent = isDark ? '☾' : '☀';
+            }, 150);
+
+            // Hide overlay after animation completes
+            setTimeout(() => {
+                tvEffect.classList.remove('active');
+                tvScreen.classList.remove('turn-on', 'turn-off');
+            }, 400);
         });
 
         // Background selection
