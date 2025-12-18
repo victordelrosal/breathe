@@ -161,6 +161,51 @@
             border-radius: 12px;
         }
 
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            text-decoration: none;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-logo-orb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle at 30% 30%,
+                rgba(139, 92, 246, 0.6) 0%,
+                rgba(6, 182, 212, 0.4) 50%,
+                rgba(16, 185, 129, 0.3) 100%);
+            box-shadow:
+                0 0 15px rgba(139, 92, 246, 0.4),
+                0 0 30px rgba(6, 182, 212, 0.2),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+            transition: transform 0.1s ease-out;
+        }
+
+        .nav-logo-orb::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
+            background-size: 5px 5px;
+            -webkit-mask-image: radial-gradient(circle at center, black 20%, transparent 70%);
+            mask-image: radial-gradient(circle at center, black 20%, transparent 70%);
+        }
+
+        .nav-logo:hover .nav-logo-orb {
+            box-shadow:
+                0 0 20px rgba(139, 92, 246, 0.6),
+                0 0 40px rgba(6, 182, 212, 0.3),
+                inset 0 0 10px rgba(255, 255, 255, 0.15);
+        }
+
         .nav-title {
             position: absolute;
             left: 50%;
@@ -172,6 +217,8 @@
             margin: 0;
             opacity: 0.9;
             text-transform: uppercase;
+            transition: transform 0.1s ease-out;
+            transform-origin: center;
         }
 
         .music-select {
@@ -862,6 +909,17 @@
                 display: none;
             }
 
+            .nav-logo {
+                width: 30px;
+                height: 30px;
+                margin-right: 8px;
+            }
+
+            .nav-logo-orb {
+                width: 24px;
+                height: 24px;
+            }
+
             .custom-panel {
                 top: auto;
                 bottom: auto;
@@ -936,6 +994,9 @@
     </div>
     <nav class="navbar">
         <div class="nav-group">
+            <a href="/" class="nav-logo" aria-label="Home">
+                <div class="nav-logo-orb" id="navLogoOrb"></div>
+            </a>
             <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">☰</button>
             <select id="pattern" class="pattern-select" aria-label="Select breathing pattern">
                 <option value="gentle">Gentle 4-2-6</option>
@@ -945,7 +1006,7 @@
             </select>
         </div>
 
-        <h1 class="nav-title">BREATHE</h1>
+        <h1 class="nav-title" id="navTitle">BREATHE</h1>
 
         <div id="customPanel" class="custom-panel hidden">
             <div class="custom-inputs">
@@ -1158,6 +1219,8 @@
         // ============================================
         const wrap = document.getElementById('wrap');
         const orbGlow = document.getElementById('orbGlow');
+        const navLogoOrb = document.getElementById('navLogoOrb');
+        const navTitle = document.getElementById('navTitle');
         const breathText = document.getElementById('breathText');
         const phaseText = document.getElementById('phaseText');
         const countdownEl = document.getElementById('countdown');
@@ -1285,6 +1348,15 @@
             const glowOpacity = 0.4 + (scale - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 0.5;
             orbGlow.style.transform = `scale(${glowScale})`;
             orbGlow.style.opacity = glowOpacity;
+
+            // Sync navbar logo orb and title with breathing
+            // Map scale (0.5-1.8) to subtle range (0.85-1.15) for nav elements
+            const navProgress = (scale - SCALE_MIN) / (SCALE_MAX - SCALE_MIN);
+            const navLogoScale = 0.85 + navProgress * 0.3;
+            const navTitleScale = 0.95 + navProgress * 0.1;
+
+            navLogoOrb.style.transform = `scale(${navLogoScale})`;
+            navTitle.style.transform = `translateX(-50%) scale(${navTitleScale})`;
         }
 
         // Easing function for smooth transitions
