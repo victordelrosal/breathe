@@ -161,6 +161,19 @@
             border-radius: 12px;
         }
 
+        .nav-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            color: var(--text-color);
+            margin: 0;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
         .music-select {
             width: 150px;
         }
@@ -677,6 +690,10 @@
                 width: 120px;
             }
 
+            .nav-title {
+                display: none;
+            }
+
             .custom-panel {
                 top: auto;
                 bottom: auto;
@@ -759,6 +776,8 @@
                 <option value="custom">Custom</option>
             </select>
         </div>
+
+        <h1 class="nav-title">BREATHE</h1>
 
         <div id="customPanel" class="custom-panel hidden">
             <div class="custom-inputs">
