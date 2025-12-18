@@ -12,50 +12,68 @@
         }
 
         :root {
-            --bg-color: #0a0a14;
-            --nav-bg: rgba(10, 10, 20, 0.7);
-            --text-color: rgba(255, 255, 255, 0.9);
-            --text-muted: rgba(255, 255, 255, 0.5);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-color: #050508;
+            --bg-gradient: radial-gradient(ellipse at 50% 0%, rgba(25, 25, 40, 0.5) 0%, transparent 50%),
+                          radial-gradient(ellipse at 50% 100%, rgba(15, 20, 30, 0.3) 0%, transparent 40%),
+                          linear-gradient(180deg, #080810 0%, #0a0a12 50%, #060608 100%);
+            --nav-bg: rgba(15, 15, 25, 0.6);
+            --nav-border: rgba(255, 255, 255, 0.06);
+            --nav-glow: rgba(255, 255, 255, 0.02);
+            --text-color: rgba(255, 255, 255, 0.87);
+            --text-muted: rgba(255, 255, 255, 0.45);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --control-bg: rgba(255, 255, 255, 0.03);
+            --control-hover: rgba(255, 255, 255, 0.06);
         }
 
         [data-theme="light"] {
-            --bg-color: #f0f0e8;
-            --nav-bg: rgba(240, 240, 232, 0.8);
-            --text-color: rgba(30, 30, 40, 0.9);
-            --text-muted: rgba(30, 30, 40, 0.5);
-            --border-color: rgba(30, 30, 40, 0.1);
+            --bg-color: #f8f8f6;
+            --bg-gradient: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+                          radial-gradient(ellipse at 50% 100%, rgba(230, 230, 225, 0.5) 0%, transparent 40%),
+                          linear-gradient(180deg, #fafaf8 0%, #f4f4f2 50%, #eeeee8 100%);
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0, 0, 0, 0.06);
+            --nav-glow: rgba(255, 255, 255, 0.5);
+            --text-color: rgba(20, 20, 30, 0.87);
+            --text-muted: rgba(20, 20, 30, 0.45);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --control-bg: rgba(0, 0, 0, 0.03);
+            --control-hover: rgba(0, 0, 0, 0.06);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
             background-color: var(--bg-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.5s ease;
+            transition: all 0.5s ease;
             overflow: hidden;
         }
 
-        /* Navbar */
+        /* Navbar - Premium Glassmorphism */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            padding: 12px 24px;
+            padding: 14px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--nav-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-bottom: 1px solid var(--nav-border);
+            box-shadow:
+                0 1px 0 0 var(--nav-glow) inset,
+                0 4px 24px -8px rgba(0, 0, 0, 0.3);
             z-index: 100;
-            opacity: 0.6;
-            transition: opacity 0.3s ease;
+            opacity: 0.85;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .navbar:hover {
@@ -71,37 +89,48 @@
         select, button {
             font-family: inherit;
             font-size: 13px;
-            padding: 8px 12px;
-            border-radius: 8px;
+            font-weight: 450;
+            padding: 8px 14px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
-            background: transparent;
+            background: var(--control-bg);
             color: var(--text-color);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.01em;
         }
 
         select:hover, button:hover {
-            border-color: var(--text-muted);
+            background: var(--control-hover);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        select:active, button:active {
+            transform: translateY(0);
         }
 
         select:focus, button:focus {
             outline: none;
-            border-color: var(--text-muted);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
         }
 
         select option {
-            background: var(--bg-color);
+            background: #1a1a24;
             color: var(--text-color);
+            padding: 8px;
         }
 
         .theme-toggle {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
+            border-radius: 12px;
         }
 
         .radio-controls {
@@ -118,8 +147,9 @@
         }
 
         .radio-btn.playing {
-            background: rgba(100, 200, 150, 0.2);
-            border-color: rgba(100, 200, 150, 0.4);
+            background: rgba(120, 200, 160, 0.12);
+            border-color: rgba(120, 200, 160, 0.25);
+            box-shadow: 0 0 20px -5px rgba(120, 200, 160, 0.2);
         }
 
         .station-select {
@@ -133,17 +163,19 @@
         /* Custom Pattern Panel */
         .custom-panel {
             position: fixed;
-            top: 70px;
+            top: 75px;
             left: 50%;
             transform: translateX(-50%);
             background: var(--nav-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px 20px;
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--nav-border);
+            border-radius: 16px;
+            padding: 18px 24px;
             z-index: 1000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow:
+                0 1px 0 0 var(--nav-glow) inset,
+                0 12px 40px -12px rgba(0, 0, 0, 0.4);
         }
 
         .custom-panel.hidden {
@@ -159,30 +191,41 @@
         .custom-inputs label {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             color: var(--text-color);
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 450;
+            letter-spacing: 0.01em;
         }
 
         .custom-inputs input {
-            width: 50px;
-            padding: 6px 8px;
+            width: 52px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: var(--control-bg);
             color: var(--text-color);
             font-size: 14px;
+            font-weight: 500;
             text-align: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .custom-inputs input:hover {
+            background: var(--control-hover);
+            border-color: rgba(255, 255, 255, 0.12);
         }
 
         .custom-inputs input:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
         }
 
         .custom-inputs .unit {
             color: var(--text-muted);
             font-size: 12px;
+            font-weight: 400;
         }
 
         /* Orb Container */
