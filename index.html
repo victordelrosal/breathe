@@ -449,10 +449,16 @@
             border-radius: 50%;
             opacity: 0;
             --hue-offset: 0;
-            background-color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), 100%, 60%);
-            color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), 100%, 60%);
+            background-color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), var(--orb-saturation, 100%), var(--orb-lightness, 60%));
+            color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), var(--orb-saturation, 100%), var(--orb-lightness, 60%));
             animation: orbit-universal var(--duration, 14s) infinite;
             animation-delay: var(--delay, 0s);
+        }
+
+        /* Light mode: dark contrasting orb */
+        [data-theme="light"] .c {
+            --orb-saturation: 70%;
+            --orb-lightness: 25%;
         }
 
         /* Parent glow instead of per-particle box-shadow */
@@ -469,6 +475,12 @@
             filter: blur(8px);
             pointer-events: none;
             opacity: 0.6;
+        }
+
+        [data-theme="light"] .wrap::after {
+            background: radial-gradient(circle,
+                hsla(calc(var(--base-hue, 270)), 60%, 30%, 0.2) 0%,
+                transparent 50%);
         }
 
         /* Reduced motion: simplified orb */
@@ -538,7 +550,11 @@
         }
 
         [data-theme="light"] .orb-glow {
-            opacity: 0.5;
+            background: radial-gradient(circle,
+                rgba(60, 40, 100, 0.35) 0%,
+                rgba(20, 80, 90, 0.2) 40%,
+                transparent 70%);
+            opacity: 0.7;
         }
 
         /* Hamburger Button */
@@ -1374,17 +1390,28 @@
 
             const hue1 = baseHue;
             const hue2 = (baseHue + 60) % 360;
+            const isLight = document.body.getAttribute('data-theme') === 'light';
 
-            // Update glow elements (only 2 updates instead of 370)
-            orbGlow.style.background = `radial-gradient(circle,
-                hsla(${hue1}, 80%, 50%, 0.3) 0%,
-                hsla(${hue2}, 80%, 50%, 0.15) 40%,
-                transparent 70%)`;
-
-            navOrbGlow.style.background = `radial-gradient(circle,
-                hsla(${hue1}, 80%, 50%, 0.4) 0%,
-                hsla(${hue2}, 80%, 50%, 0.2) 40%,
-                transparent 70%)`;
+            // Update glow elements - dark colors for light mode
+            if (isLight) {
+                orbGlow.style.background = `radial-gradient(circle,
+                    hsla(${hue1}, 50%, 25%, 0.4) 0%,
+                    hsla(${hue2}, 50%, 25%, 0.2) 40%,
+                    transparent 70%)`;
+                navOrbGlow.style.background = `radial-gradient(circle,
+                    hsla(${hue1}, 50%, 25%, 0.5) 0%,
+                    hsla(${hue2}, 50%, 25%, 0.25) 40%,
+                    transparent 70%)`;
+            } else {
+                orbGlow.style.background = `radial-gradient(circle,
+                    hsla(${hue1}, 80%, 50%, 0.3) 0%,
+                    hsla(${hue2}, 80%, 50%, 0.15) 40%,
+                    transparent 70%)`;
+                navOrbGlow.style.background = `radial-gradient(circle,
+                    hsla(${hue1}, 80%, 50%, 0.4) 0%,
+                    hsla(${hue2}, 80%, 50%, 0.2) 40%,
+                    transparent 70%)`;
+            }
         }
 
         function colorCycle(timestamp) {
