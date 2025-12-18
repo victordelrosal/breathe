@@ -361,43 +361,57 @@
             opacity: 0.5;
         }
 
-        /* Disclaimer Footer */
-        .disclaimer-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px 20px;
+        /* Hamburger Button */
+        .hamburger-btn {
+            font-size: 20px;
+            width: 38px;
+            height: 38px;
+            padding: 0;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            color: var(--text-muted);
-            opacity: 0.5;
-            transition: opacity 0.3s ease;
-            z-index: 50;
+            justify-content: center;
+            border-radius: 10px;
         }
 
-        .disclaimer-footer:hover {
-            opacity: 0.8;
+        /* Hamburger Menu Dropdown */
+        .hamburger-menu {
+            position: fixed;
+            top: 65px;
+            left: 28px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--nav-border);
+            border-radius: 12px;
+            padding: 8px;
+            z-index: 200;
+            box-shadow:
+                0 1px 0 0 var(--nav-glow) inset,
+                0 12px 40px -12px rgba(0, 0, 0, 0.4);
+            min-width: 180px;
         }
 
-        .disclaimer-link {
+        .hamburger-menu.hidden {
+            display: none;
+        }
+
+        .menu-item {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
             background: none;
             border: none;
-            color: var(--text-muted);
-            font-size: 11px;
-            padding: 2px 6px;
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 14px;
+            font-weight: 450;
+            text-align: left;
             cursor: pointer;
-            opacity: 0.9;
-            transition: opacity 0.2s ease;
+            transition: background 0.2s ease;
         }
 
-        .disclaimer-link:hover {
-            opacity: 1;
-            background: none;
-            border: none;
+        .menu-item:hover {
+            background: var(--control-hover);
             transform: none;
         }
 
@@ -493,6 +507,68 @@
             opacity: 0.8;
         }
 
+        .section-heading {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        .section-heading:first-child {
+            margin-top: 0;
+        }
+
+        .references {
+            font-size: 0.9em;
+            margin-top: 16px;
+        }
+
+        .references p {
+            margin-bottom: 10px;
+        }
+
+        .references a {
+            color: var(--text-muted);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .references a:hover {
+            color: var(--text-color);
+            text-decoration: underline;
+        }
+
+        .accept-btn {
+            display: block;
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px 24px;
+            background: rgba(100, 180, 140, 0.2);
+            border: 1px solid rgba(100, 180, 140, 0.3);
+            border-radius: 12px;
+            color: var(--text-color);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .accept-btn:hover {
+            background: rgba(100, 180, 140, 0.3);
+            border-color: rgba(100, 180, 140, 0.4);
+            transform: none;
+        }
+
+        .accept-btn.hidden {
+            display: none;
+        }
+
+        /* Body scroll lock when modal open */
+        body.modal-open {
+            overflow: hidden;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .navbar {
@@ -568,15 +644,9 @@
                 height: 220px;
             }
 
-            .disclaimer-footer {
-                font-size: 10px;
-                padding: 8px 16px;
-                flex-wrap: wrap;
-                gap: 4px;
-            }
-
-            .disclaimer-link {
-                font-size: 10px;
+            .hamburger-menu {
+                left: 16px;
+                top: 60px;
             }
 
             .modal-content {
@@ -599,58 +669,7 @@
     <div id="bgLayer" class="bg-layer"></div>
     <nav class="navbar">
         <div class="nav-group">
-            <select id="language" aria-label="Select language">
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-                <option value="hi">हिन्दी</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
-                <option value="ar">العربية</option>
-                <option value="bn">বাংলা</option>
-                <option value="pt">Português</option>
-                <option value="ru">Русский</option>
-                <option value="ja">日本語</option>
-                <option value="de">Deutsch</option>
-                <option value="ko">한국어</option>
-                <option value="vi">Tiếng Việt</option>
-                <option value="tr">Türkçe</option>
-                <option value="it">Italiano</option>
-                <option value="th">ไทย</option>
-                <option value="pl">Polski</option>
-                <option value="nl">Nederlands</option>
-                <option value="id">Indonesia</option>
-                <option value="el">Ελληνικά</option>
-                <option value="cs">Čeština</option>
-                <option value="sv">Svenska</option>
-                <option value="hu">Magyar</option>
-                <option value="fi">Suomi</option>
-                <option value="he">עברית</option>
-                <option value="uk">Українська</option>
-                <option value="ro">Română</option>
-                <option value="ms">Bahasa Melayu</option>
-                <option value="tl">Filipino</option>
-                <option value="sw">Kiswahili</option>
-                <option value="ta">தமிழ்</option>
-                <option value="ur">اردو</option>
-                <option value="fa">فارسی</option>
-                <option value="mr">मराठी</option>
-                <option value="te">తెలుగు</option>
-                <option value="pa">ਪੰਜਾਬੀ</option>
-                <option value="gu">ગુજરાતી</option>
-                <option value="kn">ಕನ್ನಡ</option>
-                <option value="ml">മലയാളം</option>
-                <option value="my">မြန်မာ</option>
-                <option value="am">አማርኛ</option>
-                <option value="ne">नेपाली</option>
-                <option value="si">සිංහල</option>
-                <option value="km">ភាសាខ្មែរ</option>
-                <option value="lo">ລາວ</option>
-                <option value="ka">ქართული</option>
-                <option value="az">Azərbaycan</option>
-                <option value="uz">O'zbek</option>
-                <option value="kk">Қазақ</option>
-                <option value="sr">Српски</option>
-            </select>
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">☰</button>
             <select id="pattern" class="pattern-select" aria-label="Select breathing pattern">
                 <option value="gentle">Gentle 4-2-6</option>
                 <option value="moderate" selected>Moderate 4-4-6</option>
@@ -716,21 +735,23 @@
 
     <audio id="radioAudio" preload="none"></audio>
 
-    <!-- Disclaimer Footer -->
-    <footer class="disclaimer-footer">
-        <span>Not medical advice. Use at your own risk.</span>
-        <button id="disclaimerBtn" class="disclaimer-link" aria-label="View full disclaimer">ℹ️ Full disclaimer</button>
-    </footer>
+    <!-- Hamburger Menu Dropdown -->
+    <div id="hamburgerMenu" class="hamburger-menu hidden">
+        <button id="menuDisclaimer" class="menu-item">Disclaimer & Safety</button>
+        <button id="menuScience" class="menu-item">The Science</button>
+    </div>
 
     <!-- Disclaimer Modal -->
     <div id="disclaimerModal" class="modal-overlay hidden">
         <div class="modal-content">
-            <button id="modalClose" class="modal-close" aria-label="Close disclaimer">&times;</button>
-            <h2>Disclaimer & Waiver</h2>
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h2>Disclaimer & Safety</h2>
             <div class="modal-body">
+                <p class="section-heading">DISCLAIMER & WAIVER</p>
                 <p>This breathing exercise application ("Breathe") is provided for relaxation and general wellness purposes only. It does not constitute medical advice, diagnosis, or treatment, and is not a substitute for professional healthcare.</p>
 
-                <p><strong>ASSUMPTION OF RISK:</strong> By using this application, you acknowledge that breathing exercises carry inherent risks including but not limited to dizziness, hyperventilation, lightheadedness, fainting, tingling, anxiety, and in rare cases, more serious adverse effects. You voluntarily assume all risks associated with use.</p>
+                <p class="section-heading">ASSUMPTION OF RISK</p>
+                <p>By using this application, you acknowledge that breathing exercises carry inherent risks including but not limited to dizziness, hyperventilation, lightheadedness, fainting, tingling, anxiety, and in rare cases, more serious adverse effects. You voluntarily assume all risks associated with use.</p>
 
                 <p><strong>STOP IMMEDIATELY</strong> if you experience dizziness, chest pain, shortness of breath, tingling, nausea, or any discomfort.</p>
 
@@ -738,13 +759,67 @@
 
                 <p><strong>CONSULT A PHYSICIAN</strong> before use if you are pregnant, have cardiovascular disease, respiratory conditions, low or high blood pressure, a history of fainting, panic disorder, epilepsy, or any other medical condition.</p>
 
-                <p><strong>LIMITATION OF LIABILITY:</strong> To the fullest extent permitted by law, the creators, developers, and distributors of this application shall not be held liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of this application. This includes, without limitation, any injury, illness, or adverse health effect.</p>
+                <p class="section-heading">LIMITATION OF LIABILITY</p>
+                <p>To the fullest extent permitted by law, the creators, developers, and distributors of this application shall not be held liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of this application. This includes, without limitation, any injury, illness, or adverse health effect.</p>
 
-                <p><strong>NO WARRANTY:</strong> This application is provided "as is" without warranties of any kind, express or implied, including fitness for a particular purpose.</p>
+                <p class="section-heading">NO WARRANTY</p>
+                <p>This application is provided "as is" without warranties of any kind, express or implied, including fitness for a particular purpose.</p>
 
-                <p><strong>INDEMNIFICATION:</strong> You agree to indemnify and hold harmless the creators and distributors of this application from any claims, damages, or expenses arising from your use.</p>
+                <p class="section-heading">INDEMNIFICATION</p>
+                <p>You agree to indemnify and hold harmless the creators and distributors of this application from any claims, damages, or expenses arising from your use.</p>
 
                 <p class="modal-footer-text">By continuing to use this application, you confirm that you have read, understood, and agree to this disclaimer.</p>
+
+                <button id="disclaimerAcceptBtn" class="accept-btn hidden">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Science Modal -->
+    <div id="scienceModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h2>The Science Behind Breathe</h2>
+            <div class="modal-body">
+                <p class="section-heading">HOW SLOW BREATHING WORKS</p>
+                <p>Slow-paced breathing in the range of 4–7 breaths per minute activates the parasympathetic nervous system, often called the "rest and digest" response. This occurs through several interconnected mechanisms:</p>
+
+                <p class="section-heading">HEART RATE VARIABILITY & VAGAL TONE</p>
+                <p>Breathing at approximately 6 breaths per minute (0.1 Hz) resonates with the baroreflex system, maximising heart rate variability — a key marker of autonomic flexibility and stress resilience. This "resonance frequency" breathing has been widely adopted in HRV biofeedback protocols.</p>
+
+                <p class="section-heading">EXTENDED EXHALATION & PARASYMPATHETIC ACTIVATION</p>
+                <p>Exhalation activates the vagus nerve, which slows heart rate and promotes relaxation. Breathing patterns where the exhale is equal to or longer than the inhale consistently enhance parasympathetic activity.</p>
+
+                <p class="section-heading">THE BREATH HOLD & THE BOHR EFFECT</p>
+                <p>A brief breath hold after inhalation allows additional time for gas exchange in the alveoli and permits a slight rise in blood CO₂ (carbon dioxide). This modest CO₂ increase shifts haemoglobin's oxygen-binding affinity via the Bohr effect, facilitating oxygen release to peripheral tissues. Contrary to common belief, oxygenation occurs throughout the respiratory cycle — not exclusively during the hold — but the hold can optimise tissue oxygen delivery.</p>
+
+                <p class="section-heading">THE 4-7-8 TECHNIQUE</p>
+                <p>Developed by Dr. Andrew Weil and rooted in pranayama yoga traditions, the 4-7-8 pattern (4s inhale, 7s hold, 8s exhale) has been studied in clinical settings. Research indicates it can reduce anxiety, lower blood pressure, and increase parasympathetic markers, particularly high-frequency HRV.</p>
+
+                <p class="section-heading">THE PATTERNS IN THIS APP</p>
+                <p>• <strong>Gentle (4–2–6):</strong> 12s cycle, 5.0 breaths/min — Entry-level with minimal hold<br>
+                • <strong>Moderate (4–4–6):</strong> 14s cycle, 4.3 breaths/min — Balanced HRV optimisation<br>
+                • <strong>Advanced (4–7–8):</strong> 19s cycle, 3.2 breaths/min — Dr. Weil's method for deep relaxation</p>
+                <p>All three patterns fall within or near the 4–7 breaths/minute range associated with enhanced HRV and parasympathetic activation in the literature.</p>
+
+                <p class="section-heading">IMPORTANT CAVEATS</p>
+                <p>• Most studies on breathing techniques involve small sample sizes and short intervention periods. While results are promising, evidence quality varies.<br>
+                • Individual responses differ; what induces calm in one person may cause discomfort in another.<br>
+                • Extended breath holds are not suitable for everyone — particularly those with cardiovascular, respiratory, or anxiety conditions.</p>
+
+                <p class="section-heading">SCIENTIFIC REFERENCES</p>
+                <div class="references">
+                    <p>1. Lehrer, P. M., & Gevirtz, R. (2014). Heart rate variability biofeedback: How and why does it work? <em>Frontiers in Psychology</em>, 5, 756. <a href="https://doi.org/10.3389/fpsyg.2014.00756" target="_blank" rel="noopener noreferrer">doi.org/10.3389/fpsyg.2014.00756</a></p>
+                    <p>2. Shaffer, F., & Ginsberg, J. P. (2017). An overview of heart rate variability metrics and norms. <em>Frontiers in Public Health</em>, 5, 258. <a href="https://doi.org/10.3389/fpubh.2017.00258" target="_blank" rel="noopener noreferrer">doi.org/10.3389/fpubh.2017.00258</a></p>
+                    <p>3. Gerritsen, R. J. S., & Band, G. P. H. (2018). Breath of life: The respiratory vagal stimulation model of contemplative activity. <em>Frontiers in Human Neuroscience</em>, 12, 397. <a href="https://doi.org/10.3389/fnhum.2018.00397" target="_blank" rel="noopener noreferrer">doi.org/10.3389/fnhum.2018.00397</a></p>
+                    <p>4. Zaccaro, A., Piarulli, A., Laurino, M., et al. (2018). How breath-control can change your life: A systematic review on psycho-physiological correlates of slow breathing. <em>Frontiers in Human Neuroscience</em>, 12, 353. <a href="https://doi.org/10.3389/fnhum.2018.00353" target="_blank" rel="noopener noreferrer">doi.org/10.3389/fnhum.2018.00353</a></p>
+                    <p>5. Bohr, C., Hasselbalch, K., & Krogh, A. (1904). Concerning a biologically important relationship — the influence of the carbon dioxide content of blood on its oxygen binding. <em>Skandinavisches Archiv für Physiologie</em>, 16, 402–412.</p>
+                    <p>6. West, J. B., & Luks, A. M. (2021). <em>West's Respiratory Physiology: The Essentials</em> (11th ed.). Wolters Kluwer.</p>
+                    <p>7. Vierra, J., Boonla, O., & Prasertsri, P. (2022). Effects of sleep deprivation and 4-7-8 breathing control on heart rate variability, blood pressure, blood glucose, and endothelial function in healthy young adults. <em>Physiological Reports</em>, 10(13), e15389. <a href="https://doi.org/10.14814/phy2.15389" target="_blank" rel="noopener noreferrer">doi.org/10.14814/phy2.15389</a></p>
+                    <p>8. Toschi-Dias, E., Tobaldini, E., Solbiati, M., et al. (2017). Sudarshan Kriya Yoga improves cardiac autonomic control in patients with anxiety-depression disorders. <em>Journal of Affective Disorders</em>, 214, 74–80. <a href="https://doi.org/10.1016/j.jad.2017.03.017" target="_blank" rel="noopener noreferrer">doi.org/10.1016/j.jad.2017.03.017</a></p>
+                    <p>9. Kayar, H., & Utku, S. (2022). The effect of deep breathing exercise and 4-7-8 breathing techniques applied to patients after bariatric surgery on anxiety and quality of life. <em>Obesity Surgery</em>, 33(1), 65–75. <a href="https://doi.org/10.1007/s11695-022-06332-7" target="_blank" rel="noopener noreferrer">doi.org/10.1007/s11695-022-06332-7</a></p>
+                    <p>10. Hopper, S. I., Murray, S. L., Ferrara, L. R., & Singleton, J. K. (2019). Effectiveness of diaphragmatic breathing for reducing physiological and psychological stress in adults: A quantitative systematic review. <em>JBI Database of Systematic Reviews and Implementation Reports</em>, 17(9), 1855–1876. <a href="https://doi.org/10.11124/JBISRIR-2017-003848" target="_blank" rel="noopener noreferrer">doi.org/10.11124/JBISRIR-2017-003848</a></p>
+                </div>
             </div>
         </div>
     </div>
@@ -784,59 +859,12 @@
         };
 
         // ============================================
-        // TRANSLATIONS (50 languages with hold)
+        // BREATHING LABELS (English only)
         // ============================================
-        const translations = {
-            en: { in: 'Breathe In', hold: 'Hold', out: 'Breathe Out' },
-            zh: { in: '吸气', hold: '屏息', out: '呼气' },
-            hi: { in: 'सांस लें', hold: 'रोकें', out: 'सांस छोड़ें' },
-            es: { in: 'Inhala', hold: 'Mantén', out: 'Exhala' },
-            fr: { in: 'Inspirez', hold: 'Retenez', out: 'Expirez' },
-            ar: { in: 'استنشق', hold: 'احبس', out: 'ازفر' },
-            bn: { in: 'শ্বাস নিন', hold: 'ধরুন', out: 'শ্বাস ছাড়ুন' },
-            pt: { in: 'Inspire', hold: 'Segure', out: 'Expire' },
-            ru: { in: 'Вдох', hold: 'Задержка', out: 'Выдох' },
-            ja: { in: '吸って', hold: '止めて', out: '吐いて' },
-            de: { in: 'Einatmen', hold: 'Halten', out: 'Ausatmen' },
-            ko: { in: '들이쉬세요', hold: '멈추세요', out: '내쉬세요' },
-            vi: { in: 'Hít vào', hold: 'Giữ', out: 'Thở ra' },
-            tr: { in: 'Nefes Al', hold: 'Tut', out: 'Nefes Ver' },
-            it: { in: 'Inspira', hold: 'Trattieni', out: 'Espira' },
-            th: { in: 'หายใจเข้า', hold: 'กลั้น', out: 'หายใจออก' },
-            pl: { in: 'Wdech', hold: 'Zatrzymaj', out: 'Wydech' },
-            nl: { in: 'Inademen', hold: 'Vasthouden', out: 'Uitademen' },
-            id: { in: 'Tarik Napas', hold: 'Tahan', out: 'Hembuskan' },
-            el: { in: 'Εισπνοή', hold: 'Κράτα', out: 'Εκπνοή' },
-            cs: { in: 'Nádech', hold: 'Zadržet', out: 'Výdech' },
-            sv: { in: 'Andas in', hold: 'Håll', out: 'Andas ut' },
-            hu: { in: 'Lélegezz be', hold: 'Tartsd', out: 'Lélegezz ki' },
-            fi: { in: 'Hengitä sisään', hold: 'Pidätä', out: 'Hengitä ulos' },
-            he: { in: 'שאיפה', hold: 'החזק', out: 'נשיפה' },
-            uk: { in: 'Вдих', hold: 'Затримка', out: 'Видих' },
-            ro: { in: 'Inspiră', hold: 'Ține', out: 'Expiră' },
-            ms: { in: 'Tarik Nafas', hold: 'Tahan', out: 'Hembus' },
-            tl: { in: 'Huminga', hold: 'Hawakan', out: 'Ilabas' },
-            sw: { in: 'Vuta Pumzi', hold: 'Shika', out: 'Toa Pumzi' },
-            ta: { in: 'உள்ளிழு', hold: 'நிறுத்து', out: 'வெளியிடு' },
-            ur: { in: 'سانس لیں', hold: 'روکیں', out: 'سانس چھوڑیں' },
-            fa: { in: 'دم', hold: 'نگه دار', out: 'بازدم' },
-            mr: { in: 'श्वास घ्या', hold: 'धरा', out: 'श्वास सोडा' },
-            te: { in: 'పీల్చు', hold: 'ఆపు', out: 'వదులు' },
-            pa: { in: 'ਸਾਹ ਲਓ', hold: 'ਰੋਕੋ', out: 'ਸਾਹ ਛੱਡੋ' },
-            gu: { in: 'શ્વાસ લો', hold: 'રોકો', out: 'શ્વાસ છોડો' },
-            kn: { in: 'ಉಸಿರು', hold: 'ಹಿಡಿ', out: 'ಬಿಡು' },
-            ml: { in: 'ശ്വസിക്കുക', hold: 'പിടിക്കുക', out: 'പുറത്തുവിടുക' },
-            my: { in: 'ရှူ', hold: 'ထိန်း', out: 'ထုတ်' },
-            am: { in: 'ተነፍስ', hold: 'ያዝ', out: 'አውጣ' },
-            ne: { in: 'सास लिनु', hold: 'रोक्नु', out: 'सास छोड्नु' },
-            si: { in: 'හුස්ම ගන්න', hold: 'රඳවන්න', out: 'හුස්ම හරින්න' },
-            km: { in: 'ដកដង្ហើមចូល', hold: 'កាន់', out: 'ដកដង្ហើមចេញ' },
-            lo: { in: 'ຫາຍໃຈເຂົ້າ', hold: 'ຖື', out: 'ຫາຍໃຈອອກ' },
-            ka: { in: 'ჩაისუნთქე', hold: 'შეაჩერე', out: 'ამოისუნთქე' },
-            az: { in: 'Nəfəs al', hold: 'Saxla', out: 'Nəfəs ver' },
-            uz: { in: 'Nafas ol', hold: 'Ushla', out: 'Nafas chiqar' },
-            kk: { in: 'Дем ал', hold: 'Ұста', out: 'Дем шығар' },
-            sr: { in: 'Удахни', hold: 'Задржи', out: 'Издахни' }
+        const breathingLabels = {
+            in: 'Breathe In',
+            hold: 'Hold',
+            out: 'Breathe Out'
         };
 
         // ============================================
@@ -857,7 +885,6 @@
         const breathText = document.getElementById('breathText');
         const phaseText = document.getElementById('phaseText');
         const countdownEl = document.getElementById('countdown');
-        const languageSelect = document.getElementById('language');
         const patternSelect = document.getElementById('pattern');
         const themeToggle = document.getElementById('themeToggle');
         const silentToggle = document.getElementById('silentToggle');
@@ -870,16 +897,17 @@
         const customInhale = document.getElementById('customInhale');
         const customHold = document.getElementById('customHold');
         const customExhale = document.getElementById('customExhale');
-        const disclaimerBtn = document.getElementById('disclaimerBtn');
-        const disclaimerModal = document.getElementById('disclaimerModal');
-        const modalClose = document.getElementById('modalClose');
         const bgSelect = document.getElementById('bgSelect');
         const bgLayer = document.getElementById('bgLayer');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const hamburgerMenu = document.getElementById('hamburgerMenu');
+        const disclaimerModal = document.getElementById('disclaimerModal');
+        const scienceModal = document.getElementById('scienceModal');
+        const disclaimerAcceptBtn = document.getElementById('disclaimerAcceptBtn');
 
         // ============================================
         // STATE
         // ============================================
-        let currentLang = 'en';
         let currentPattern = localStorage.getItem('breathPattern') || 'moderate';
         let pendingPattern = null; // Pattern to apply at next cycle
         let currentBg = localStorage.getItem('breathBg') || 'none';
@@ -994,8 +1022,7 @@
         // TEXT & COUNTDOWN DISPLAY
         // ============================================
         function getPhaseLabel(key) {
-            const t = translations[currentLang] || translations.en;
-            return t[key] || translations.en[key];
+            return breathingLabels[key];
         }
 
         function updateDisplay(phaseKey, secondsRemaining) {
@@ -1093,10 +1120,6 @@
         // ============================================
         // EVENT HANDLERS
         // ============================================
-        languageSelect.addEventListener('change', (e) => {
-            currentLang = e.target.value;
-        });
-
         patternSelect.addEventListener('change', (e) => {
             // Queue pattern change for next cycle start
             pendingPattern = e.target.value;
@@ -1190,25 +1213,91 @@
             console.log('Track unavailable');
         });
 
-        // Disclaimer modal handlers
-        disclaimerBtn.addEventListener('click', () => {
-            disclaimerModal.classList.remove('hidden');
+        // ============================================
+        // HAMBURGER MENU & MODALS
+        // ============================================
+        const menuDisclaimer = document.getElementById('menuDisclaimer');
+        const menuScience = document.getElementById('menuScience');
+
+        function openModal(modal) {
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-open');
+            hamburgerMenu.classList.add('hidden');
+        }
+
+        function closeModal(modal) {
+            modal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        }
+
+        function closeAllModals() {
+            closeModal(disclaimerModal);
+            closeModal(scienceModal);
+        }
+
+        // Hamburger menu toggle
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburgerMenu.classList.toggle('hidden');
         });
 
-        modalClose.addEventListener('click', () => {
-            disclaimerModal.classList.add('hidden');
-        });
-
-        disclaimerModal.addEventListener('click', (e) => {
-            if (e.target === disclaimerModal) {
-                disclaimerModal.classList.add('hidden');
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburgerMenu.contains(e.target) && e.target !== hamburgerBtn) {
+                hamburgerMenu.classList.add('hidden');
             }
         });
 
+        // Menu item handlers
+        menuDisclaimer.addEventListener('click', () => {
+            openModal(disclaimerModal);
+        });
+
+        menuScience.addEventListener('click', () => {
+            openModal(scienceModal);
+        });
+
+        // Close buttons in modals
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal-overlay');
+                closeModal(modal);
+            });
+        });
+
+        // Close modal on backdrop click
+        [disclaimerModal, scienceModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        });
+
+        // Close modal on Escape key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !disclaimerModal.classList.contains('hidden')) {
-                disclaimerModal.classList.add('hidden');
+            if (e.key === 'Escape') {
+                closeAllModals();
+                hamburgerMenu.classList.add('hidden');
             }
+        });
+
+        // First-time visitor disclaimer acceptance
+        const disclaimerAccepted = localStorage.getItem('disclaimerAccepted');
+        if (!disclaimerAccepted) {
+            // Show accept button for first-time visitors
+            disclaimerAcceptBtn.classList.remove('hidden');
+            // Hide close button for first-time visitors
+            disclaimerModal.querySelector('.modal-close').style.display = 'none';
+            // Open disclaimer modal
+            openModal(disclaimerModal);
+        }
+
+        disclaimerAcceptBtn.addEventListener('click', () => {
+            localStorage.setItem('disclaimerAccepted', 'true');
+            disclaimerAcceptBtn.classList.add('hidden');
+            disclaimerModal.querySelector('.modal-close').style.display = '';
+            closeModal(disclaimerModal);
         });
 
         // ============================================
