@@ -738,14 +738,15 @@
         }
 
         .blog-card {
-            width: min(90vw, 600px);
-            aspect-ratio: 3 / 2;
+            width: min(90vw, 650px);
+            min-height: 400px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 50px 40px 40px;
             background-color: #050508;
             background-image:
                 radial-gradient(ellipse at 50% 0%, rgba(25, 25, 40, 0.5) 0%, transparent 50%),
@@ -755,6 +756,32 @@
             border-radius: 20px;
             cursor: default;
             animation: cardBreathe 4s ease-in-out infinite;
+        }
+
+        .card-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 24px;
+            line-height: 1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: scale(1.1);
         }
 
         @keyframes cardBreathe {
@@ -843,27 +870,24 @@
 
         .card-title {
             font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
-            font-size: clamp(40px, 10vw, 60px);
-            font-weight: 400;
-            letter-spacing: 2px;
+            font-size: clamp(28px, 7vw, 42px);
+            font-weight: 300;
+            letter-spacing: 0.1em;
             color: #F8E473;
-            text-transform: uppercase;
             line-height: 1;
-            text-shadow:
-                2px 2px 0 #000,
-                -1px 1px 0 #000,
-                1px -1px 0 #000,
-                -1px -1px 0 #000;
+            margin-bottom: 20px;
         }
 
-        .card-subtitle {
-            margin-top: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            font-size: clamp(12px, 3vw, 16px);
-            color: rgba(255, 255, 255, 0.45);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-weight: 300;
+        .card-description {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: clamp(14px, 3.5vw, 17px);
+            font-weight: 400;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.75);
+            text-align: center;
+            max-width: 540px;
+            margin: 0;
+            font-style: italic;
         }
 
         .card-glass-frame {
@@ -1062,7 +1086,7 @@
     <div id="hamburgerMenu" class="hamburger-menu hidden">
         <button id="menuDisclaimer" class="menu-item">Disclaimer & Safety</button>
         <button id="menuScience" class="menu-item">The Science</button>
-        <button id="menuCard" class="menu-item">Show Card</button>
+        <button id="menuCard" class="menu-item">Why Breathe?</button>
     </div>
 
     <!-- Disclaimer Modal -->
@@ -1150,12 +1174,13 @@
     <!-- Card Overlay -->
     <div id="cardOverlay" class="card-overlay hidden">
         <div class="blog-card" id="blogCard">
+            <button class="card-close" id="cardCloseBtn" aria-label="Close">&times;</button>
             <div class="card-code-texture"></div>
             <div class="card-orb-glow"></div>
             <div class="card-particle-orb"></div>
             <div class="card-text-container">
-                <div class="card-title">BREATHE</div>
-                <div class="card-subtitle">Interactive CSS & JS Project</div>
+                <div class="card-title">Why Breathe?</div>
+                <p class="card-description">Deep, intentional breathing is one of the simplest yet most powerful tools for wellbeing. When you slow your breath, you activate your parasympathetic nervous system—the body's natural "rest and digest" mode—lowering cortisol, reducing blood pressure, and calming the mind. Just a few minutes of focused breathing can sharpen mental clarity, ease anxiety, improve sleep quality, and restore emotional balance. Ancient practices and modern science agree: conscious breathing transforms stress into serenity, one breath at a time.</p>
             </div>
             <div class="card-glass-frame"></div>
         </div>
@@ -1605,24 +1630,19 @@
 
         // Card overlay
         const menuCard = document.getElementById('menuCard');
-        let cardTimeout = null;
+        const cardCloseBtn = document.getElementById('cardCloseBtn');
 
         function showCard() {
             hamburgerMenu.classList.add('hidden');
             cardOverlay.classList.add('active');
-            // Auto-dismiss after 5 seconds
-            cardTimeout = setTimeout(hideCard, 5000);
         }
 
         function hideCard() {
             cardOverlay.classList.remove('active');
-            if (cardTimeout) {
-                clearTimeout(cardTimeout);
-                cardTimeout = null;
-            }
         }
 
         menuCard.addEventListener('click', showCard);
+        cardCloseBtn.addEventListener('click', hideCard);
 
         // Click outside card to close
         cardOverlay.addEventListener('click', (e) => {
