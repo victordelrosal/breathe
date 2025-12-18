@@ -889,6 +889,17 @@
             pointer-events: none;
         }
 
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+            opacity: 0.5;
+            z-index: 5;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .navbar {
@@ -1060,6 +1071,8 @@
     </div>
 
     <audio id="radioAudio" preload="none"></audio>
+
+    <div class="footer"><span id="viewCount"></span> views</div>
 
     <!-- Hamburger Menu Dropdown -->
     <div id="hamburgerMenu" class="hamburger-menu hidden">
@@ -1747,6 +1760,18 @@
         colorCycle(0);
         setOrbScale(SCALE_MIN);
         startBreathing();
+
+        // ============================================
+        // VIEW COUNTER (CountAPI)
+        // ============================================
+        fetch('https://api.countapi.xyz/hit/breathe-zen-orb/visits')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('viewCount').textContent = data.value.toLocaleString();
+            })
+            .catch(() => {
+                document.querySelector('.footer').style.display = 'none';
+            });
     </script>
 </body>
 </html>
