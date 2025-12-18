@@ -181,15 +181,15 @@
         }
 
         .station-select {
-            width: 100px;
+            width: 130px;
         }
 
         .pattern-select {
-            width: 110px;
+            width: 140px;
         }
 
         .bg-select {
-            width: 115px;
+            width: 140px;
         }
 
         /* Background Image Layer */
@@ -590,15 +590,15 @@
             }
 
             .station-select {
-                width: 80px;
+                width: 110px;
             }
 
             .pattern-select {
-                width: 95px;
+                width: 120px;
             }
 
             .bg-select {
-                width: 100px;
+                width: 120px;
             }
 
             .custom-panel {
@@ -717,11 +717,9 @@
             <select id="bgSelect" class="bg-select" aria-label="Select background">
                 <option value="1">Background 1</option>
                 <option value="2">Background 2</option>
-                <option value="3">Background 3</option>
                 <option value="4">Background 4</option>
                 <option value="none">Pure Black</option>
             </select>
-            <button id="silentToggle" class="theme-toggle" aria-label="Toggle silent mode" title="Silent mode">💬</button>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
         </div>
     </nav>
@@ -889,7 +887,6 @@
         const countdownEl = document.getElementById('countdown');
         const patternSelect = document.getElementById('pattern');
         const themeToggle = document.getElementById('themeToggle');
-        const silentToggle = document.getElementById('silentToggle');
         const radioBtn = document.getElementById('radioBtn');
         const radioIcon = document.getElementById('radioIcon');
         const radioText = document.getElementById('radioText');
@@ -918,7 +915,6 @@
         customInhale.value = savedCustom.inhale;
         customHold.value = savedCustom.hold;
         customExhale.value = savedCustom.exhale;
-        let silentMode = localStorage.getItem('silentMode') === 'true';
         let isPlaying = false;
 
         // Animation state
@@ -1027,22 +1023,8 @@
         }
 
         function updateDisplay(phaseKey, secondsRemaining) {
-            if (!silentMode) {
-                phaseText.textContent = getPhaseLabel(phaseKey);
-                countdownEl.textContent = secondsRemaining;
-            }
-        }
-
-        function updateSilentModeUI() {
-            if (silentMode) {
-                breathText.style.opacity = '0';
-                silentToggle.textContent = '🔇';
-                silentToggle.title = 'Silent mode (on)';
-            } else {
-                breathText.style.opacity = '0.95';
-                silentToggle.textContent = '💬';
-                silentToggle.title = 'Silent mode (off)';
-            }
+            phaseText.textContent = getPhaseLabel(phaseKey);
+            countdownEl.textContent = secondsRemaining;
         }
 
         // ============================================
@@ -1146,12 +1128,6 @@
         customHold.addEventListener('change', saveCustomPattern);
         customExhale.addEventListener('change', saveCustomPattern);
 
-        silentToggle.addEventListener('click', () => {
-            silentMode = !silentMode;
-            localStorage.setItem('silentMode', silentMode);
-            updateSilentModeUI();
-        });
-
         themeToggle.addEventListener('click', () => {
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
@@ -1163,7 +1139,6 @@
         const bgImages = {
             '1': 'backgr/damien-dufour-TH2cSJMA4ik-unsplash.jpg',
             '2': 'backgr/jackson-hendry-eodA_8CTOFo-unsplash.jpg',
-            '3': 'backgr/omar-ramadan-vcRHpfrsaL8-unsplash.jpg',
             '4': 'backgr/sam-schooler-E9aetBe2w40-unsplash.jpg'
         };
 
@@ -1181,7 +1156,8 @@
         // Random background on first visit, otherwise use saved preference
         if (!localStorage.getItem('breathBg')) {
             // First visit - start with random background
-            currentBg = String(Math.floor(Math.random() * 4) + 1);
+            const bgOptions = ['1', '2', '4'];
+            currentBg = bgOptions[Math.floor(Math.random() * bgOptions.length)];
         }
         bgSelect.value = currentBg;
         setBackground(currentBg);
@@ -1301,7 +1277,6 @@
         createParticleOrb();
         updateParticleColors();
         colorCycle();
-        updateSilentModeUI();
         setOrbScale(SCALE_MIN);
         startBreathing();
     </script>
