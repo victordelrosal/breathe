@@ -791,9 +791,9 @@
                 const scale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * easedProgress;
                 setOrbScale(scale);
             } else if (phase.key === 'hold') {
-                // Hold: stay at MAX with subtle 5% pulse at 1Hz
-                const pulsePhase = (elapsed / 1000) * Math.PI * 2; // 1Hz = 2π per second
-                const pulse = Math.sin(pulsePhase) * 0.05; // ±5% of current scale
+                // Hold: stay at MAX with very subtle 1.5% pulse at 0.4Hz
+                const pulsePhase = (elapsed / 1000) * Math.PI * 0.8; // 0.4Hz = slower, calmer
+                const pulse = Math.sin(pulsePhase) * 0.015; // ±1.5% - barely perceptible
                 setOrbScale(SCALE_MAX * (1 + pulse));
             } else if (phase.key === 'out') {
                 // Exhale: scale from MAX to MIN
