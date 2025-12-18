@@ -130,6 +130,61 @@
             width: 110px;
         }
 
+        /* Custom Pattern Panel */
+        .custom-panel {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .custom-panel.hidden {
+            display: none;
+        }
+
+        .custom-inputs {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .custom-inputs label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .custom-inputs input {
+            width: 50px;
+            padding: 6px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .custom-inputs input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-inputs .unit {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
         /* Orb Container */
         .orb-container {
             position: relative;
@@ -269,6 +324,33 @@
                 width: 95px;
             }
 
+            .custom-panel {
+                top: auto;
+                bottom: auto;
+                margin-top: 10px;
+                position: relative;
+                width: 100%;
+                left: 0;
+                transform: none;
+                padding: 12px 16px;
+            }
+
+            .custom-inputs {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .custom-inputs label {
+                font-size: 12px;
+            }
+
+            .custom-inputs input {
+                width: 45px;
+                padding: 5px 6px;
+                font-size: 13px;
+            }
+
             .orb-container {
                 width: 300px;
                 height: 300px;
@@ -349,7 +431,28 @@
                 <option value="gentle">Gentle 4-2-6</option>
                 <option value="moderate" selected>Moderate 4-4-6</option>
                 <option value="advanced">Advanced 4-7-8</option>
+                <option value="custom">Custom</option>
             </select>
+        </div>
+
+        <div id="customPanel" class="custom-panel hidden">
+            <div class="custom-inputs">
+                <label>
+                    <span>Inhale</span>
+                    <input type="number" id="customInhale" min="1" max="30" value="4">
+                    <span class="unit">s</span>
+                </label>
+                <label>
+                    <span>Hold</span>
+                    <input type="number" id="customHold" min="0" max="30" value="4">
+                    <span class="unit">s</span>
+                </label>
+                <label>
+                    <span>Exhale</span>
+                    <input type="number" id="customExhale" min="1" max="30" value="6">
+                    <span class="unit">s</span>
+                </label>
+            </div>
         </div>
 
         <div class="nav-group">
@@ -499,6 +602,10 @@
         const radioText = document.getElementById('radioText');
         const stationSelect = document.getElementById('station');
         const radioAudio = document.getElementById('radioAudio');
+        const customPanel = document.getElementById('customPanel');
+        const customInhale = document.getElementById('customInhale');
+        const customHold = document.getElementById('customHold');
+        const customExhale = document.getElementById('customExhale');
 
         // ============================================
         // STATE
@@ -506,6 +613,12 @@
         let currentLang = 'en';
         let currentPattern = localStorage.getItem('breathPattern') || 'moderate';
         let pendingPattern = null; // Pattern to apply at next cycle
+
+        // Load custom pattern values from localStorage
+        const savedCustom = JSON.parse(localStorage.getItem('customBreathPattern') || '{"inhale":4,"hold":4,"exhale":6}');
+        customInhale.value = savedCustom.inhale;
+        customHold.value = savedCustom.hold;
+        customExhale.value = savedCustom.exhale;
         let silentMode = localStorage.getItem('silentMode') === 'true';
         let isPlaying = false;
 
@@ -517,6 +630,10 @@
 
         // Initialize pattern dropdown
         patternSelect.value = currentPattern;
+        // Show custom panel if custom pattern was saved
+        if (currentPattern === 'custom') {
+            customPanel.classList.remove('hidden');
+        }
 
         // ============================================
         // PARTICLE ORB CREATION
@@ -634,6 +751,13 @@
         // BREATHING SCHEDULER
         // ============================================
         function getPattern() {
+            if (currentPattern === 'custom') {
+                return [
+                    { key: 'in', ms: parseInt(customInhale.value) * 1000 || 4000 },
+                    { key: 'hold', ms: parseInt(customHold.value) * 1000 || 0 },
+                    { key: 'out', ms: parseInt(customExhale.value) * 1000 || 6000 }
+                ].filter(phase => phase.ms > 0); // Remove hold if 0
+            }
             return patterns[currentPattern];
         }
 
@@ -706,7 +830,27 @@
         patternSelect.addEventListener('change', (e) => {
             // Queue pattern change for next cycle start
             pendingPattern = e.target.value;
+            // Show/hide custom panel
+            if (e.target.value === 'custom') {
+                customPanel.classList.remove('hidden');
+            } else {
+                customPanel.classList.add('hidden');
+            }
         });
+
+        // Custom pattern inputs - save to localStorage on change
+        function saveCustomPattern() {
+            const custom = {
+                inhale: parseInt(customInhale.value) || 4,
+                hold: parseInt(customHold.value) || 0,
+                exhale: parseInt(customExhale.value) || 6
+            };
+            localStorage.setItem('customBreathPattern', JSON.stringify(custom));
+        }
+
+        customInhale.addEventListener('change', saveCustomPattern);
+        customHold.addEventListener('change', saveCustomPattern);
+        customExhale.addEventListener('change', saveCustomPattern);
 
         silentToggle.addEventListener('click', () => {
             silentMode = !silentMode;
