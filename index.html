@@ -378,7 +378,7 @@
             box-shadow: 0 0 6px 1px currentColor;
         }
 
-        /* Breathing text - classic cinema subtitle style (Helvetica, soft yellow, thin outline) */
+        /* Breathing text - elegant subtitle style with soft shadow */
         .breath-text {
             position: fixed;
             bottom: 5%;
@@ -391,14 +391,9 @@
             color: #F8E473;
             text-align: center;
             text-shadow:
-                1px 1px 0 #000,
-                -1px 1px 0 #000,
-                1px -1px 0 #000,
-                -1px -1px 0 #000,
-                0 1px 0 #000,
-                0 -1px 0 #000,
-                1px 0 0 #000,
-                -1px 0 0 #000;
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.4),
+                0 8px 24px rgba(0, 0, 0, 0.3);
             z-index: 10;
             pointer-events: none;
             opacity: 1;
@@ -420,14 +415,9 @@
         [data-theme="light"] .breath-text {
             color: #D4AF37;
             text-shadow:
-                1px 1px 0 #000,
-                -1px 1px 0 #000,
-                1px -1px 0 #000,
-                -1px -1px 0 #000,
-                0 1px 0 #000,
-                0 -1px 0 #000,
-                1px 0 0 #000,
-                -1px 0 0 #000;
+                0 2px 4px rgba(0, 0, 0, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                0 8px 24px rgba(0, 0, 0, 0.15);
         }
 
         /* Glow effect behind orb - JS controlled */
