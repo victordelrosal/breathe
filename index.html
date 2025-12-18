@@ -542,6 +542,36 @@
             opacity: 0.9;
         }
 
+        .max-limit-disclaimer {
+            display: block;
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+            color: rgba(255, 180, 180, 0.9);
+            text-decoration: none;
+            text-transform: none;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .max-limit-disclaimer:hover {
+            color: rgba(255, 220, 220, 1);
+            text-decoration: underline;
+        }
+
+        .max-limit-disclaimer.hidden {
+            display: none;
+        }
+
+        [data-theme="light"] .max-limit-disclaimer {
+            color: rgba(180, 60, 60, 0.9);
+        }
+
+        [data-theme="light"] .max-limit-disclaimer:hover {
+            color: rgba(150, 30, 30, 1);
+        }
+
         [data-theme="light"] .breath-text {
             color: #000;
             text-shadow: none;
@@ -1145,6 +1175,7 @@
     <div class="breath-text" id="breathText">
         <span id="phaseText">Breathe In</span>
         <span class="countdown" id="countdown">4</span>
+        <a href="#" id="maxLimitDisclaimer" class="max-limit-disclaimer hidden">Disclaimer & Safety</a>
     </div>
 
     <audio id="radioAudio" preload="none"></audio>
@@ -1250,6 +1281,10 @@
             <div class="modal-body">
                 <p>A complete changelog of all updates to Breathe, from newest to oldest.</p>
                 <div class="changelog">
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Show Disclaimer & Safety link under subtitles when any custom value is at max limit</span>
+                    </div>
                     <div class="changelog-entry">
                         <span class="changelog-date">2025-12-18</span>
                         <span class="changelog-text">Enforce hard limits with shake animation on violation (Inhale: 10s, Hold: 30s, Exhale: 15s)</span>
@@ -1823,6 +1858,8 @@
             } else {
                 customPanel.classList.add('hidden');
             }
+            // Check if max limits disclaimer should be shown
+            checkMaxLimits();
         });
 
         // Custom pattern inputs - HARD LIMITS (never exceeded)
@@ -1865,13 +1902,45 @@
             localStorage.setItem('customBreathPattern', JSON.stringify(custom));
         }
 
+        // Max limit disclaimer link
+        const maxLimitDisclaimer = document.getElementById('maxLimitDisclaimer');
+
+        function checkMaxLimits() {
+            // Only show if custom pattern is active and any value is at max
+            if (currentPattern === 'custom' || pendingPattern === 'custom') {
+                const inhaleAtMax = parseInt(customInhale.value) >= CUSTOM_LIMITS.inhale.max;
+                const holdAtMax = parseInt(customHold.value) >= CUSTOM_LIMITS.hold.max;
+                const exhaleAtMax = parseInt(customExhale.value) >= CUSTOM_LIMITS.exhale.max;
+
+                if (inhaleAtMax || holdAtMax || exhaleAtMax) {
+                    maxLimitDisclaimer.classList.remove('hidden');
+                } else {
+                    maxLimitDisclaimer.classList.add('hidden');
+                }
+            } else {
+                maxLimitDisclaimer.classList.add('hidden');
+            }
+        }
+
         // Validate on input (while typing) and on change (blur)
-        customInhale.addEventListener('input', () => validateAndClamp(customInhale, CUSTOM_LIMITS.inhale));
-        customHold.addEventListener('input', () => validateAndClamp(customHold, CUSTOM_LIMITS.hold));
-        customExhale.addEventListener('input', () => validateAndClamp(customExhale, CUSTOM_LIMITS.exhale));
+        customInhale.addEventListener('input', () => {
+            validateAndClamp(customInhale, CUSTOM_LIMITS.inhale);
+            checkMaxLimits();
+        });
+        customHold.addEventListener('input', () => {
+            validateAndClamp(customHold, CUSTOM_LIMITS.hold);
+            checkMaxLimits();
+        });
+        customExhale.addEventListener('input', () => {
+            validateAndClamp(customExhale, CUSTOM_LIMITS.exhale);
+            checkMaxLimits();
+        });
         customInhale.addEventListener('change', saveCustomPattern);
         customHold.addEventListener('change', saveCustomPattern);
         customExhale.addEventListener('change', saveCustomPattern);
+
+        // Check max limits on page load if custom pattern is selected
+        checkMaxLimits();
 
         // Theme toggle with diagonal wipe effect
         const wipeOverlay = document.getElementById('wipeOverlay');
@@ -1990,6 +2059,12 @@
 
         // Menu item handlers
         menuDisclaimer.addEventListener('click', () => {
+            openModal(disclaimerModal);
+        });
+
+        // Max limit disclaimer link (shown when custom values at max)
+        maxLimitDisclaimer.addEventListener('click', (e) => {
+            e.preventDefault();
             openModal(disclaimerModal);
         });
 
