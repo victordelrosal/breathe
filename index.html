@@ -160,6 +160,31 @@
             width: 110px;
         }
 
+        .bg-select {
+            width: 70px;
+        }
+
+        /* Background Image Layer */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bg-layer.active {
+            opacity: 0.4;
+        }
+
+        [data-theme="light"] .bg-layer.active {
+            opacity: 0.25;
+        }
+
         /* Custom Pattern Panel */
         .custom-panel {
             position: fixed;
@@ -493,6 +518,10 @@
                 width: 95px;
             }
 
+            .bg-select {
+                width: 60px;
+            }
+
             .custom-panel {
                 top: auto;
                 bottom: auto;
@@ -567,6 +596,7 @@
     </style>
 </head>
 <body data-theme="dark">
+    <div id="bgLayer" class="bg-layer"></div>
     <nav class="navbar">
         <div class="nav-group">
             <select id="language" aria-label="Select language">
@@ -662,6 +692,13 @@
                     <span id="radioText">Play</span>
                 </button>
             </div>
+            <select id="bgSelect" class="bg-select" aria-label="Select background">
+                <option value="none">No BG</option>
+                <option value="1">BG 1</option>
+                <option value="2">BG 2</option>
+                <option value="3">BG 3</option>
+                <option value="4">BG 4</option>
+            </select>
             <button id="silentToggle" class="theme-toggle" aria-label="Toggle silent mode" title="Silent mode">💬</button>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
         </div>
@@ -836,6 +873,8 @@
         const disclaimerBtn = document.getElementById('disclaimerBtn');
         const disclaimerModal = document.getElementById('disclaimerModal');
         const modalClose = document.getElementById('modalClose');
+        const bgSelect = document.getElementById('bgSelect');
+        const bgLayer = document.getElementById('bgLayer');
 
         // ============================================
         // STATE
@@ -843,6 +882,7 @@
         let currentLang = 'en';
         let currentPattern = localStorage.getItem('breathPattern') || 'moderate';
         let pendingPattern = null; // Pattern to apply at next cycle
+        let currentBg = localStorage.getItem('breathBg') || 'none';
 
         // Load custom pattern values from localStorage
         const savedCustom = JSON.parse(localStorage.getItem('customBreathPattern') || '{"inhale":4,"hold":4,"exhale":6}');
@@ -1093,6 +1133,25 @@
             const isDark = body.getAttribute('data-theme') === 'dark';
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             themeToggle.textContent = isDark ? '☾' : '☀';
+        });
+
+        // Background selection
+        function setBackground(value) {
+            if (value === 'none') {
+                bgLayer.style.backgroundImage = '';
+                bgLayer.classList.remove('active');
+            } else {
+                bgLayer.style.backgroundImage = `url('backgr/backgr0${value}.png')`;
+                bgLayer.classList.add('active');
+            }
+            localStorage.setItem('breathBg', value);
+        }
+
+        bgSelect.value = currentBg;
+        setBackground(currentBg);
+
+        bgSelect.addEventListener('change', (e) => {
+            setBackground(e.target.value);
         });
 
         // Music controls
