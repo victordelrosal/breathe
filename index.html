@@ -195,7 +195,9 @@
         /* Background Image Layer */
         .bg-layer {
             position: fixed;
-            inset: 0;
+            inset: -5%;
+            width: 110%;
+            height: 110%;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -203,14 +205,25 @@
             transition: opacity 0.5s ease;
             z-index: -1;
             pointer-events: none;
+            transform-origin: center center;
         }
 
         .bg-layer.active {
             opacity: 0.4;
+            animation: bgBreathe 12s ease-in-out infinite;
         }
 
         [data-theme="light"] .bg-layer.active {
             opacity: 0.25;
+        }
+
+        @keyframes bgBreathe {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
         }
 
         /* CRT TV Effect Overlay */
@@ -794,9 +807,9 @@
                 </button>
             </div>
             <select id="bgSelect" class="bg-select" aria-label="Select background">
-                <option value="1">Background 1</option>
-                <option value="2">Background 2</option>
-                <option value="4">Background 4</option>
+                <option value="1">Ocean</option>
+                <option value="2">Galaxy</option>
+                <option value="4">Sky</option>
                 <option value="none">Pure Black</option>
             </select>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
