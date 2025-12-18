@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zen Breathing</title>
+    <title>Breathe</title>
     <style>
         * {
             margin: 0;
@@ -126,6 +126,10 @@
             width: 100px;
         }
 
+        .pattern-select {
+            width: 110px;
+        }
+
         /* Orb Container */
         .orb-container {
             position: relative;
@@ -136,28 +140,20 @@
             height: 400px;
         }
 
-        /* Particle Orb Wrapper */
+        /* Particle Orb Wrapper - JS controls scale, CSS handles rotation only */
         .wrap {
             position: relative;
             width: 0;
             height: 0;
             transform-style: preserve-3d;
             perspective: 1000px;
-            animation: rotate 20s infinite linear, breathe 10s ease-in-out infinite;
+            animation: rotate 20s infinite linear;
+            transition: transform 0.1s linear;
         }
 
         @keyframes rotate {
             100% {
                 transform: rotateY(360deg) rotateX(360deg);
-            }
-        }
-
-        @keyframes breathe {
-            0%, 100% {
-                scale: 1.8;
-            }
-            40% {
-                scale: 0.5;
             }
         }
 
@@ -201,6 +197,14 @@
             line-height: 1.4;
         }
 
+        .countdown {
+            display: block;
+            font-size: 22px;
+            font-weight: 400;
+            margin-top: 4px;
+            opacity: 0.85;
+        }
+
         [data-theme="light"] .breath-text {
             color: #ffffff;
             text-shadow:
@@ -215,7 +219,7 @@
                 3px 3px 6px rgba(0, 0, 0, 0.8);
         }
 
-        /* Glow effect behind orb */
+        /* Glow effect behind orb - JS controlled */
         .orb-glow {
             position: absolute;
             width: 300px;
@@ -227,18 +231,7 @@
                 transparent 70%);
             filter: blur(40px);
             pointer-events: none;
-            animation: glowPulse 10s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% {
-                transform: scale(2);
-                opacity: 0.9;
-            }
-            40% {
-                transform: scale(0.5);
-                opacity: 0.4;
-            }
+            transition: transform 0.1s linear, opacity 0.1s linear;
         }
 
         [data-theme="light"] .orb-glow {
@@ -266,6 +259,10 @@
                 width: 80px;
             }
 
+            .pattern-select {
+                width: 95px;
+            }
+
             .orb-container {
                 width: 300px;
                 height: 300px;
@@ -274,6 +271,10 @@
             .breath-text {
                 font-size: 22px;
                 bottom: 6%;
+            }
+
+            .countdown {
+                font-size: 18px;
             }
 
             .orb-glow {
@@ -338,6 +339,11 @@
                 <option value="kk">Қазақ</option>
                 <option value="sr">Српски</option>
             </select>
+            <select id="pattern" class="pattern-select" aria-label="Select breathing pattern">
+                <option value="gentle">Gentle 4-2-6</option>
+                <option value="moderate" selected>Moderate 4-4-6</option>
+                <option value="advanced">Advanced 4-7-8</option>
+            </select>
         </div>
 
         <div class="nav-group">
@@ -345,7 +351,7 @@
                 <select id="station" class="station-select" aria-label="Select music track">
                     <option value="0">Peaceful</option>
                     <option value="1">Soothing</option>
-                    <option value="2">Zen Garden</option>
+                    <option value="2">Tranquil Garden</option>
                     <option value="3">Ambient</option>
                 </select>
                 <button id="radioBtn" class="radio-btn" aria-label="Play/Stop music">
@@ -363,36 +369,165 @@
         <div class="wrap" id="wrap"></div>
     </div>
 
-    <div class="breath-text" id="breathText">Breathe In</div>
+    <div class="breath-text" id="breathText">
+        <span id="phaseText">Breathe In</span>
+        <span class="countdown" id="countdown">4</span>
+    </div>
 
     <audio id="radioAudio" preload="none"></audio>
 
     <script>
-        // Configuration
+        // ============================================
+        // PARTICLE ORB CONFIGURATION
+        // ============================================
         const TOTAL_PARTICLES = 250;
         const ORB_SIZE = 100;
         const PARTICLE_TIME = 14;
-        let baseHue = 270; // Start with purple
+        let baseHue = 270;
 
-        // Generate particles and their animations
+        // Scale bounds
+        const SCALE_MIN = 0.5;
+        const SCALE_MAX = 1.8;
+
+        // ============================================
+        // BREATHING PATTERNS
+        // ============================================
+        const patterns = {
+            gentle: [
+                { key: 'in', ms: 4000 },
+                { key: 'hold', ms: 2000 },
+                { key: 'out', ms: 6000 }
+            ],
+            moderate: [
+                { key: 'in', ms: 4000 },
+                { key: 'hold', ms: 4000 },
+                { key: 'out', ms: 6000 }
+            ],
+            advanced: [
+                { key: 'in', ms: 4000 },
+                { key: 'hold', ms: 7000 },
+                { key: 'out', ms: 8000 }
+            ]
+        };
+
+        // ============================================
+        // TRANSLATIONS (50 languages with hold)
+        // ============================================
+        const translations = {
+            en: { in: 'Breathe In', hold: 'Hold', out: 'Breathe Out' },
+            zh: { in: '吸气', hold: '屏息', out: '呼气' },
+            hi: { in: 'सांस लें', hold: 'रोकें', out: 'सांस छोड़ें' },
+            es: { in: 'Inhala', hold: 'Mantén', out: 'Exhala' },
+            fr: { in: 'Inspirez', hold: 'Retenez', out: 'Expirez' },
+            ar: { in: 'استنشق', hold: 'احبس', out: 'ازفر' },
+            bn: { in: 'শ্বাস নিন', hold: 'ধরুন', out: 'শ্বাস ছাড়ুন' },
+            pt: { in: 'Inspire', hold: 'Segure', out: 'Expire' },
+            ru: { in: 'Вдох', hold: 'Задержка', out: 'Выдох' },
+            ja: { in: '吸って', hold: '止めて', out: '吐いて' },
+            de: { in: 'Einatmen', hold: 'Halten', out: 'Ausatmen' },
+            ko: { in: '들이쉬세요', hold: '멈추세요', out: '내쉬세요' },
+            vi: { in: 'Hít vào', hold: 'Giữ', out: 'Thở ra' },
+            tr: { in: 'Nefes Al', hold: 'Tut', out: 'Nefes Ver' },
+            it: { in: 'Inspira', hold: 'Trattieni', out: 'Espira' },
+            th: { in: 'หายใจเข้า', hold: 'กลั้น', out: 'หายใจออก' },
+            pl: { in: 'Wdech', hold: 'Zatrzymaj', out: 'Wydech' },
+            nl: { in: 'Inademen', hold: 'Vasthouden', out: 'Uitademen' },
+            id: { in: 'Tarik Napas', hold: 'Tahan', out: 'Hembuskan' },
+            el: { in: 'Εισπνοή', hold: 'Κράτα', out: 'Εκπνοή' },
+            cs: { in: 'Nádech', hold: 'Zadržet', out: 'Výdech' },
+            sv: { in: 'Andas in', hold: 'Håll', out: 'Andas ut' },
+            hu: { in: 'Lélegezz be', hold: 'Tartsd', out: 'Lélegezz ki' },
+            fi: { in: 'Hengitä sisään', hold: 'Pidätä', out: 'Hengitä ulos' },
+            he: { in: 'שאיפה', hold: 'החזק', out: 'נשיפה' },
+            uk: { in: 'Вдих', hold: 'Затримка', out: 'Видих' },
+            ro: { in: 'Inspiră', hold: 'Ține', out: 'Expiră' },
+            ms: { in: 'Tarik Nafas', hold: 'Tahan', out: 'Hembus' },
+            tl: { in: 'Huminga', hold: 'Hawakan', out: 'Ilabas' },
+            sw: { in: 'Vuta Pumzi', hold: 'Shika', out: 'Toa Pumzi' },
+            ta: { in: 'உள்ளிழு', hold: 'நிறுத்து', out: 'வெளியிடு' },
+            ur: { in: 'سانس لیں', hold: 'روکیں', out: 'سانس چھوڑیں' },
+            fa: { in: 'دم', hold: 'نگه دار', out: 'بازدم' },
+            mr: { in: 'श्वास घ्या', hold: 'धरा', out: 'श्वास सोडा' },
+            te: { in: 'పీల్చు', hold: 'ఆపు', out: 'వదులు' },
+            pa: { in: 'ਸਾਹ ਲਓ', hold: 'ਰੋਕੋ', out: 'ਸਾਹ ਛੱਡੋ' },
+            gu: { in: 'શ્વાસ લો', hold: 'રોકો', out: 'શ્વાસ છોડો' },
+            kn: { in: 'ಉಸಿರು', hold: 'ಹಿಡಿ', out: 'ಬಿಡು' },
+            ml: { in: 'ശ്വസിക്കുക', hold: 'പിടിക്കുക', out: 'പുറത്തുവിടുക' },
+            my: { in: 'ရှူ', hold: 'ထိန်း', out: 'ထုတ်' },
+            am: { in: 'ተነፍስ', hold: 'ያዝ', out: 'አውጣ' },
+            ne: { in: 'सास लिनु', hold: 'रोक्नु', out: 'सास छोड्नु' },
+            si: { in: 'හුස්ම ගන්න', hold: 'රඳවන්න', out: 'හුස්ම හරින්න' },
+            km: { in: 'ដកដង្ហើមចូល', hold: 'កាន់', out: 'ដកដង្ហើមចេញ' },
+            lo: { in: 'ຫາຍໃຈເຂົ້າ', hold: 'ຖື', out: 'ຫາຍໃຈອອກ' },
+            ka: { in: 'ჩაისუნთქე', hold: 'შეაჩერე', out: 'ამოისუნთქე' },
+            az: { in: 'Nəfəs al', hold: 'Saxla', out: 'Nəfəs ver' },
+            uz: { in: 'Nafas ol', hold: 'Ushla', out: 'Nafas chiqar' },
+            kk: { in: 'Дем ал', hold: 'Ұста', out: 'Дем шығар' },
+            sr: { in: 'Удахни', hold: 'Задржи', out: 'Издахни' }
+        };
+
+        // ============================================
+        // LOCAL MUSIC TRACKS
+        // ============================================
+        const tracks = [
+            'music/relax-meditate-gentle-peaceful-291162.mp3',
+            'music/soothing-meditation-without-voice-315921.mp3',
+            'music/zen-garden-310599.mp3',
+            'music/zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403.mp3'
+        ];
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const wrap = document.getElementById('wrap');
+        const orbGlow = document.getElementById('orbGlow');
+        const breathText = document.getElementById('breathText');
+        const phaseText = document.getElementById('phaseText');
+        const countdownEl = document.getElementById('countdown');
+        const languageSelect = document.getElementById('language');
+        const patternSelect = document.getElementById('pattern');
+        const themeToggle = document.getElementById('themeToggle');
+        const silentToggle = document.getElementById('silentToggle');
+        const radioBtn = document.getElementById('radioBtn');
+        const radioIcon = document.getElementById('radioIcon');
+        const radioText = document.getElementById('radioText');
+        const stationSelect = document.getElementById('station');
+        const radioAudio = document.getElementById('radioAudio');
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentLang = 'en';
+        let currentPattern = localStorage.getItem('breathPattern') || 'moderate';
+        let pendingPattern = null; // Pattern to apply at next cycle
+        let silentMode = localStorage.getItem('silentMode') === 'true';
+        let isPlaying = false;
+
+        // Animation state
+        let currentPhaseIndex = 0;
+        let phaseStartTime = 0;
+        let animationFrameId = null;
+        let currentScale = SCALE_MIN;
+
+        // Initialize pattern dropdown
+        patternSelect.value = currentPattern;
+
+        // ============================================
+        // PARTICLE ORB CREATION
+        // ============================================
         function createParticleOrb() {
-            const wrap = document.getElementById('wrap');
             const styleSheet = document.createElement('style');
             let css = '';
 
             for (let i = 1; i <= TOTAL_PARTICLES; i++) {
-                // Create particle element
                 const particle = document.createElement('div');
                 particle.className = 'c';
                 particle.id = `p${i}`;
                 wrap.appendChild(particle);
 
-                // Random angles for 3D sphere distribution
                 const z = Math.random() * 360;
                 const y = Math.random() * 360;
-                const hueOffset = (40 / TOTAL_PARTICLES) * i;
 
-                // Generate keyframes for this particle - stays in orb formation
                 css += `
                     .c:nth-child(${i}) {
                         animation: orbit${i} ${PARTICLE_TIME}s infinite;
@@ -419,7 +554,9 @@
             document.head.appendChild(styleSheet);
         }
 
-        // Update particle colors based on hue
+        // ============================================
+        // COLOR CYCLING
+        // ============================================
         function updateParticleColors() {
             const particles = document.querySelectorAll('.c');
             particles.forEach((particle, i) => {
@@ -428,8 +565,6 @@
                 particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
             });
 
-            // Update glow
-            const orbGlow = document.getElementById('orbGlow');
             const hue1 = baseHue;
             const hue2 = (baseHue + 60) % 360;
             orbGlow.style.background = `radial-gradient(circle,
@@ -438,172 +573,141 @@
                 transparent 70%)`;
         }
 
-        // Color cycle animation
         function colorCycle() {
             baseHue = (baseHue + 0.3) % 360;
             updateParticleColors();
             requestAnimationFrame(colorCycle);
         }
 
-        // Initialize particles
-        createParticleOrb();
-        updateParticleColors();
-        colorCycle();
+        // ============================================
+        // ORB SCALE ANIMATION (JS-driven)
+        // ============================================
+        function setOrbScale(scale) {
+            currentScale = scale;
+            wrap.style.scale = scale;
+            // Glow follows orb scale with slight amplification
+            const glowScale = 0.5 + (scale - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 1.5;
+            const glowOpacity = 0.4 + (scale - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 0.5;
+            orbGlow.style.transform = `scale(${glowScale})`;
+            orbGlow.style.opacity = glowOpacity;
+        }
 
-        // Translations (50 languages)
-        const translations = {
-            en: { in: 'Breathe In', out: 'Breathe Out' },
-            zh: { in: '吸气', out: '呼气' },
-            hi: { in: 'सांस लें', out: 'सांस छोड़ें' },
-            es: { in: 'Inhala', out: 'Exhala' },
-            fr: { in: 'Inspirez', out: 'Expirez' },
-            ar: { in: 'استنشق', out: 'ازفر' },
-            bn: { in: 'শ্বাস নিন', out: 'শ্বাস ছাড়ুন' },
-            pt: { in: 'Inspire', out: 'Expire' },
-            ru: { in: 'Вдох', out: 'Выдох' },
-            ja: { in: '吸って', out: '吐いて' },
-            de: { in: 'Einatmen', out: 'Ausatmen' },
-            ko: { in: '들이쉬세요', out: '내쉬세요' },
-            vi: { in: 'Hít vào', out: 'Thở ra' },
-            tr: { in: 'Nefes Al', out: 'Nefes Ver' },
-            it: { in: 'Inspira', out: 'Espira' },
-            th: { in: 'หายใจเข้า', out: 'หายใจออก' },
-            pl: { in: 'Wdech', out: 'Wydech' },
-            nl: { in: 'Inademen', out: 'Uitademen' },
-            id: { in: 'Tarik Napas', out: 'Hembuskan' },
-            el: { in: 'Εισπνοή', out: 'Εκπνοή' },
-            cs: { in: 'Nádech', out: 'Výdech' },
-            sv: { in: 'Andas in', out: 'Andas ut' },
-            hu: { in: 'Lélegezz be', out: 'Lélegezz ki' },
-            fi: { in: 'Hengitä sisään', out: 'Hengitä ulos' },
-            he: { in: 'שאיפה', out: 'נשיפה' },
-            uk: { in: 'Вдих', out: 'Видих' },
-            ro: { in: 'Inspiră', out: 'Expiră' },
-            ms: { in: 'Tarik Nafas', out: 'Hembus' },
-            tl: { in: 'Huminga', out: 'Ilabas' },
-            sw: { in: 'Vuta Pumzi', out: 'Toa Pumzi' },
-            ta: { in: 'உள்ளிழு', out: 'வெளியிடு' },
-            ur: { in: 'سانس لیں', out: 'سانس چھوڑیں' },
-            fa: { in: 'دم', out: 'بازدم' },
-            mr: { in: 'श्वास घ्या', out: 'श्वास सोडा' },
-            te: { in: 'పీల్చు', out: 'వదులు' },
-            pa: { in: 'ਸਾਹ ਲਓ', out: 'ਸਾਹ ਛੱਡੋ' },
-            gu: { in: 'શ્વાસ લો', out: 'શ્વાસ છોડો' },
-            kn: { in: 'ಉಸಿರು', out: 'ಬಿಡು' },
-            ml: { in: 'ശ്വസിക്കുക', out: 'പുറത്തുവിടുക' },
-            my: { in: 'ရှူ', out: 'ထုတ်' },
-            am: { in: 'ተነፍስ', out: 'አውጣ' },
-            ne: { in: 'सास लिनु', out: 'सास छोड्नु' },
-            si: { in: 'හුස්ම ගන්න', out: 'හුස්ම හරින්න' },
-            km: { in: 'ដកដង្ហើមចូល', out: 'ដកដង្ហើមចេញ' },
-            lo: { in: 'ຫາຍໃຈເຂົ້າ', out: 'ຫາຍໃຈອອກ' },
-            ka: { in: 'ჩაისუნთქე', out: 'ამოისუნთქე' },
-            az: { in: 'Nəfəs al', out: 'Nəfəs ver' },
-            uz: { in: 'Nafas ol', out: 'Nafas chiqar' },
-            kk: { in: 'Дем ал', out: 'Дем шығар' },
-            sr: { in: 'Удахни', out: 'Издахни' }
-        };
+        // Easing function for smooth transitions
+        function easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        }
 
-        // Local music tracks
-        const tracks = [
-            'music/relax-meditate-gentle-peaceful-291162.mp3',
-            'music/soothing-meditation-without-voice-315921.mp3',
-            'music/zen-garden-310599.mp3',
-            'music/zen-spiritual-yoga-massage-meditation-spa-relax-ambient-music-18403.mp3'
-        ];
+        // ============================================
+        // TEXT & COUNTDOWN DISPLAY
+        // ============================================
+        function getPhaseLabel(key) {
+            const t = translations[currentLang] || translations.en;
+            return t[key] || translations.en[key];
+        }
 
-        // DOM elements
-        const breathText = document.getElementById('breathText');
-        const languageSelect = document.getElementById('language');
-        const themeToggle = document.getElementById('themeToggle');
-        const silentToggle = document.getElementById('silentToggle');
-        const radioBtn = document.getElementById('radioBtn');
-        const radioIcon = document.getElementById('radioIcon');
-        const radioText = document.getElementById('radioText');
-        const stationSelect = document.getElementById('station');
-        const radioAudio = document.getElementById('radioAudio');
+        function updateDisplay(phaseKey, secondsRemaining) {
+            if (!silentMode) {
+                phaseText.textContent = getPhaseLabel(phaseKey);
+                countdownEl.textContent = secondsRemaining;
+            }
+        }
 
-        let currentLang = 'en';
-        let isPlaying = false;
-        let breathingIn = true;
-
-        // Breathing cycle: 4s inhale, 6s exhale = 10s total
-        const INHALE_DURATION = 4000;
-        const EXHALE_DURATION = 6000;
-        const TOTAL_CYCLE = INHALE_DURATION + EXHALE_DURATION;
-
-        // Silent mode: hide text cues
-        let silentMode = localStorage.getItem('silentMode') === 'true';
-
-        // Initialize silent mode UI
         function updateSilentModeUI() {
             if (silentMode) {
                 breathText.style.opacity = '0';
                 silentToggle.textContent = '🔇';
                 silentToggle.title = 'Silent mode (on)';
             } else {
-                breathText.style.opacity = '0.9';
+                breathText.style.opacity = '0.95';
                 silentToggle.textContent = '💬';
                 silentToggle.title = 'Silent mode (off)';
             }
         }
-        updateSilentModeUI();
 
-        // Update breath text (respects silent mode)
-        function updateBreathText() {
-            if (!silentMode) {
-                const t = translations[currentLang] || translations.en;
-                breathText.textContent = breathingIn ? t.in : t.out;
+        // ============================================
+        // BREATHING SCHEDULER
+        // ============================================
+        function getPattern() {
+            return patterns[currentPattern];
+        }
+
+        function startPhase(phaseIndex) {
+            const pattern = getPattern();
+            currentPhaseIndex = phaseIndex % pattern.length;
+            phaseStartTime = performance.now();
+
+            // If starting a new cycle (phase 0), check for pending pattern change
+            if (currentPhaseIndex === 0 && pendingPattern) {
+                currentPattern = pendingPattern;
+                pendingPattern = null;
+                localStorage.setItem('breathPattern', currentPattern);
             }
         }
 
-        // Breathing cycle controller - synced to CSS animation
-        const wrap = document.getElementById('wrap');
-        let exhaleTimeout = null;
+        function breathingLoop(timestamp) {
+            const pattern = getPattern();
+            const phase = pattern[currentPhaseIndex];
+            const elapsed = timestamp - phaseStartTime;
+            const progress = Math.min(elapsed / phase.ms, 1);
+            const easedProgress = easeInOutQuad(progress);
 
-        function startBreathCycle() {
-            // Clear any existing timeout
-            if (exhaleTimeout) clearTimeout(exhaleTimeout);
+            // Calculate seconds remaining (update at least every 250ms means we show whole seconds)
+            const msRemaining = Math.max(0, phase.ms - elapsed);
+            const secondsRemaining = Math.ceil(msRemaining / 1000);
 
-            // Start inhale (orb contracting)
-            breathingIn = true;
-            updateBreathText();
+            // Update orb scale based on phase
+            if (phase.key === 'in') {
+                // Inhale: scale from MIN to MAX
+                const scale = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * easedProgress;
+                setOrbScale(scale);
+            } else if (phase.key === 'hold') {
+                // Hold: stay at MAX with subtle 5% pulse at 1Hz
+                const pulsePhase = (elapsed / 1000) * Math.PI * 2; // 1Hz = 2π per second
+                const pulse = Math.sin(pulsePhase) * 0.05; // ±5% of current scale
+                setOrbScale(SCALE_MAX * (1 + pulse));
+            } else if (phase.key === 'out') {
+                // Exhale: scale from MAX to MIN
+                const scale = SCALE_MAX - (SCALE_MAX - SCALE_MIN) * easedProgress;
+                setOrbScale(scale);
+            }
 
-            // After inhale duration, switch to exhale (orb expanding)
-            exhaleTimeout = setTimeout(() => {
-                breathingIn = false;
-                updateBreathText();
-            }, INHALE_DURATION);
+            // Update display
+            updateDisplay(phase.key, secondsRemaining);
+
+            // Check if phase is complete
+            if (progress >= 1) {
+                startPhase(currentPhaseIndex + 1);
+            }
+
+            animationFrameId = requestAnimationFrame(breathingLoop);
         }
 
-        // Sync with CSS animation using animationiteration event
-        wrap.addEventListener('animationiteration', (e) => {
-            if (e.animationName === 'breathe') {
-                startBreathCycle();
+        function startBreathing() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
             }
-        });
+            startPhase(0);
+            animationFrameId = requestAnimationFrame(breathingLoop);
+        }
 
-        // Initial start - sync with CSS animation start
-        startBreathCycle();
-
-        // Language change handler
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
         languageSelect.addEventListener('change', (e) => {
             currentLang = e.target.value;
-            updateBreathText();
         });
 
-        // Silent mode toggle
+        patternSelect.addEventListener('change', (e) => {
+            // Queue pattern change for next cycle start
+            pendingPattern = e.target.value;
+        });
+
         silentToggle.addEventListener('click', () => {
             silentMode = !silentMode;
             localStorage.setItem('silentMode', silentMode);
             updateSilentModeUI();
-            // If turning off silent mode, update text to current phase
-            if (!silentMode) {
-                updateBreathText();
-            }
         });
 
-        // Theme toggle
         themeToggle.addEventListener('click', () => {
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
@@ -612,7 +716,7 @@
         });
 
         // Music controls
-        radioAudio.loop = true; // Loop tracks
+        radioAudio.loop = true;
 
         function toggleMusic() {
             if (isPlaying) {
@@ -643,10 +747,19 @@
             }
         });
 
-        // Handle audio errors gracefully
         radioAudio.addEventListener('error', () => {
             console.log('Track unavailable');
         });
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        createParticleOrb();
+        updateParticleColors();
+        colorCycle();
+        updateSilentModeUI();
+        setOrbScale(SCALE_MIN);
+        startBreathing();
     </script>
 </body>
 </html>
