@@ -735,6 +735,37 @@
             text-decoration: underline;
         }
 
+        /* Changelog styling */
+        .changelog {
+            margin-top: 16px;
+        }
+
+        .changelog-entry {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .changelog-entry:last-child {
+            border-bottom: none;
+        }
+
+        .changelog-date {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+            padding-top: 1px;
+        }
+
+        .changelog-text {
+            font-size: 13px;
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
         /* Body scroll lock when modal open */
         body.modal-open {
             overflow: hidden;
@@ -1113,6 +1144,7 @@
         <button id="menuScience" class="menu-item">The Science</button>
         <button id="menuCreating" class="menu-item">Creating Breathe</button>
         <button id="menuDisclaimer" class="menu-item">Disclaimer & Safety</button>
+        <button id="menuDevUpdates" class="menu-item">Dev Updates</button>
     </div>
 
     <!-- Disclaimer Modal -->
@@ -1192,6 +1224,203 @@
                     <p>8. Toschi-Dias, E., Tobaldini, E., Solbiati, M., et al. (2017). Sudarshan Kriya Yoga improves cardiac autonomic control in patients with anxiety-depression disorders. <em>Journal of Affective Disorders</em>, 214, 74–80. <a href="https://doi.org/10.1016/j.jad.2017.03.017" target="_blank" rel="noopener noreferrer">doi.org/10.1016/j.jad.2017.03.017</a></p>
                     <p>9. Kurt Aktaş, G., et al. (2023). The effect of deep breathing exercise and 4-7-8 breathing techniques applied to patients after bariatric surgery on anxiety and quality of life. <em>Obesity Surgery</em>, 33(3), 920–929. <a href="https://pubmed.ncbi.nlm.nih.gov/36480101/" target="_blank" rel="noopener noreferrer">PubMed</a></p>
                     <p>10. Hopper, S. I., Murray, S. L., Ferrara, L. R., & Singleton, J. K. (2019). Effectiveness of diaphragmatic breathing for reducing physiological and psychological stress in adults: A quantitative systematic review. <em>JBI Database of Systematic Reviews and Implementation Reports</em>, 17(9), 1855–1876. <a href="https://doi.org/10.11124/JBISRIR-2017-003848" target="_blank" rel="noopener noreferrer">doi.org/10.11124/JBISRIR-2017-003848</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dev Updates Modal -->
+    <div id="devUpdatesModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close">&times;</button>
+            <h2>Dev Updates</h2>
+            <div class="modal-body">
+                <p>A complete changelog of all updates to Breathe, from newest to oldest.</p>
+                <div class="changelog">
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add Dev Updates modal with full changelog</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Set hard limits for custom breathing pattern inputs (Inhale: 10s, Hold: 30s, Exhale: 15s)</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add 'Creating Breathe' link to burger menu</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add Breathe.png image asset for social sharing</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Swap pink for yellow/orange in favicon</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Change favicon background to circle shape</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Reorganize favicon: cyan center, pink edges</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Use Mexican pink for favicon dots</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Make favicon dots brighter with neon colors</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add black rounded background to favicon</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Use dark contrasting colors for orb in light mode</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add social media previews and Apple touch icon</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add particle orb favicon</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Fix views counter - switch to counterapi.dev</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add subtle views counter in footer</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Optimize particle orb rendering for better performance</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add theme wash effect, nano particle orb, and UI refinements</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Increase theme toggle transition to 600ms</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Change light mode subtitles to black without shadow</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Replace subtitle outline with elegant blurred shadow</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Remove hyperlink from navbar favicon</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Remove singularity effect, use gentle CSS transition for theme toggle</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Fix navbar logo link to work locally and on production</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Replace TV effect with singularity collapse animation</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Rename Show Card to Why Breathe? with benefits paragraph</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add breathing logo orb to navbar, sync title with breathing</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add Show Card option in hamburger menu</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Soften CRT TV effect - less blinding</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add BREATHE title to center of navbar</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Merge music controls into single dropdown</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Rename backgrounds and add breathing zoom effect</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add CRT TV on/off effect for theme switching</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">UI cleanup: widen selects, remove bg3, remove subtitle toggle</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Fix broken DOI link, remove auto-open disclaimer</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Update backgrounds, random start, enhanced navbar</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Major refactor: English-only, hamburger menu, modals</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add background image selector with 4 options</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add legal disclaimer footer and modal</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Elevate UI to premium, polished design</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Style subtitles as classic cinema: Helvetica, soft yellow, thin outline</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Make hold phase pulse much more subtle</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add custom breathing pattern option</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Make subtitles more cinematic with larger font and bold styling</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Add breathing pattern dropdown with hold phase support</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Style breathing cues as cinema subtitles at bottom of screen</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Initial commit: Zen breathing meditation app with particle orb, color cycling, and ambient music</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1661,6 +1890,8 @@
         // ============================================
         const menuDisclaimer = document.getElementById('menuDisclaimer');
         const menuScience = document.getElementById('menuScience');
+        const menuDevUpdates = document.getElementById('menuDevUpdates');
+        const devUpdatesModal = document.getElementById('devUpdatesModal');
 
         function openModal(modal) {
             modal.classList.remove('hidden');
@@ -1676,6 +1907,7 @@
         function closeAllModals() {
             closeModal(disclaimerModal);
             closeModal(scienceModal);
+            closeModal(devUpdatesModal);
         }
 
         // Hamburger menu toggle
@@ -1698,6 +1930,10 @@
 
         menuScience.addEventListener('click', () => {
             openModal(scienceModal);
+        });
+
+        menuDevUpdates.addEventListener('click', () => {
+            openModal(devUpdatesModal);
         });
 
         // Creating Breathe link
@@ -1739,7 +1975,7 @@
         });
 
         // Close modal on backdrop click
-        [disclaimerModal, scienceModal].forEach(modal => {
+        [disclaimerModal, scienceModal, devUpdatesModal].forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     closeModal(modal);
