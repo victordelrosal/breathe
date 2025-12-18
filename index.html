@@ -669,6 +669,166 @@
             overflow: hidden;
         }
 
+        /* Card Overlay */
+        .card-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            cursor: pointer;
+        }
+
+        .card-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .blog-card {
+            width: min(90vw, 600px);
+            aspect-ratio: 3 / 2;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #050508;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(25, 25, 40, 0.5) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(15, 20, 30, 0.3) 0%, transparent 40%),
+                linear-gradient(180deg, #080810 0%, #0a0a12 50%, #060608 100%);
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            cursor: default;
+            animation: cardBreathe 4s ease-in-out infinite;
+        }
+
+        @keyframes cardBreathe {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+        }
+
+        .card-code-texture {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 100% 20px;
+            pointer-events: none;
+        }
+
+        .card-orb-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle,
+                rgba(139, 92, 246, 0.4) 0%,
+                rgba(6, 182, 212, 0.2) 40%,
+                transparent 70%);
+            filter: blur(40px);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            animation: glowPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% {
+                opacity: 0.8;
+                transform: translate(-50%, -60%) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -60%) scale(1.1);
+            }
+        }
+
+        .card-particle-orb {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            position: relative;
+            transform: translateY(-20px);
+            background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.5px, transparent 2px);
+            background-size: 15px 15px;
+            background-position: center;
+            -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+            mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+            animation: orbBreathe 4s ease-in-out infinite;
+        }
+
+        @keyframes orbBreathe {
+            0%, 100% {
+                transform: translateY(-20px) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.15);
+            }
+        }
+
+        .card-particle-orb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(139, 92, 246, 0.8) 2px, transparent 2.5px);
+            background-size: 12px 12px;
+            transform: rotate(15deg) scale(0.8);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 60%);
+        }
+
+        .card-text-container {
+            margin-top: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .card-title {
+            font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+            font-size: clamp(40px, 10vw, 60px);
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #F8E473;
+            text-transform: uppercase;
+            line-height: 1;
+            text-shadow:
+                2px 2px 0 #000,
+                -1px 1px 0 #000,
+                1px -1px 0 #000,
+                -1px -1px 0 #000;
+        }
+
+        .card-subtitle {
+            margin-top: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            font-size: clamp(12px, 3vw, 16px);
+            color: rgba(255, 255, 255, 0.45);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        .card-glass-frame {
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+            pointer-events: none;
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .navbar {
@@ -841,6 +1001,7 @@
     <div id="hamburgerMenu" class="hamburger-menu hidden">
         <button id="menuDisclaimer" class="menu-item">Disclaimer & Safety</button>
         <button id="menuScience" class="menu-item">The Science</button>
+        <button id="menuCard" class="menu-item">Show Card</button>
     </div>
 
     <!-- Disclaimer Modal -->
@@ -925,6 +1086,20 @@
         </div>
     </div>
 
+    <!-- Card Overlay -->
+    <div id="cardOverlay" class="card-overlay hidden">
+        <div class="blog-card" id="blogCard">
+            <div class="card-code-texture"></div>
+            <div class="card-orb-glow"></div>
+            <div class="card-particle-orb"></div>
+            <div class="card-text-container">
+                <div class="card-title">BREATHE</div>
+                <div class="card-subtitle">Interactive CSS & JS Project</div>
+            </div>
+            <div class="card-glass-frame"></div>
+        </div>
+    </div>
+
     <script>
         // ============================================
         // PARTICLE ORB CONFIGURATION
@@ -1002,6 +1177,8 @@
         const hamburgerMenu = document.getElementById('hamburgerMenu');
         const disclaimerModal = document.getElementById('disclaimerModal');
         const scienceModal = document.getElementById('scienceModal');
+        const cardOverlay = document.getElementById('cardOverlay');
+        const blogCard = document.getElementById('blogCard');
 
         // ============================================
         // STATE
@@ -1354,6 +1531,34 @@
             openModal(scienceModal);
         });
 
+        // Card overlay
+        const menuCard = document.getElementById('menuCard');
+        let cardTimeout = null;
+
+        function showCard() {
+            hamburgerMenu.classList.add('hidden');
+            cardOverlay.classList.add('active');
+            // Auto-dismiss after 5 seconds
+            cardTimeout = setTimeout(hideCard, 5000);
+        }
+
+        function hideCard() {
+            cardOverlay.classList.remove('active');
+            if (cardTimeout) {
+                clearTimeout(cardTimeout);
+                cardTimeout = null;
+            }
+        }
+
+        menuCard.addEventListener('click', showCard);
+
+        // Click outside card to close
+        cardOverlay.addEventListener('click', (e) => {
+            if (e.target === cardOverlay) {
+                hideCard();
+            }
+        });
+
         // Close buttons in modals
         document.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1375,6 +1580,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeAllModals();
+                hideCard();
                 hamburgerMenu.classList.add('hidden');
             }
         });
