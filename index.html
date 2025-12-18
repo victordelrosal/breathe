@@ -60,7 +60,7 @@
             top: 0;
             left: 0;
             right: 0;
-            padding: 14px 28px;
+            padding: 14px 28px 14px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -201,7 +201,6 @@
             height: 2px;
             border-radius: 50%;
             opacity: 0;
-            box-shadow: 0 0 3px 0.5px currentColor;
         }
 
         .nav-center {
@@ -388,6 +387,7 @@
             justify-content: center;
             width: 400px;
             height: 400px;
+            contain: layout style;
         }
 
         /* Particle Orb Wrapper - JS controls scale, CSS handles rotation only */
@@ -399,6 +399,7 @@
             perspective: 1000px;
             animation: rotate 20s infinite linear;
             transition: transform 0.1s linear;
+            will-change: transform;
         }
 
         @keyframes rotate {
@@ -407,14 +408,62 @@
             }
         }
 
-        /* Individual particle */
+        /* Shared orbit animation using CSS variables */
+        @keyframes orbit-universal {
+            0% {
+                opacity: 0;
+                transform: rotateZ(var(--rz)) rotateY(var(--ry)) translateX(0) rotateZ(var(--rz-inv));
+            }
+            15% {
+                opacity: 1;
+                transform: rotateZ(var(--rz)) rotateY(var(--ry)) translateX(var(--radius)) rotateZ(var(--rz-inv));
+            }
+            100% {
+                opacity: 1;
+                transform: rotateZ(var(--rz)) rotateY(var(--ry)) translateX(var(--radius)) rotateZ(var(--rz-inv));
+            }
+        }
+
+        /* Individual particle - optimized with CSS variables for color */
         .c {
             position: absolute;
             width: 3px;
             height: 3px;
             border-radius: 50%;
             opacity: 0;
-            box-shadow: 0 0 6px 1px currentColor;
+            --hue-offset: 0;
+            background-color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), 100%, 60%);
+            color: hsl(calc(var(--base-hue, 270) + var(--hue-offset)), 100%, 60%);
+            animation: orbit-universal var(--duration, 14s) infinite;
+            animation-delay: var(--delay, 0s);
+        }
+
+        /* Parent glow instead of per-particle box-shadow */
+        .wrap::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            left: -50%;
+            top: -50%;
+            background: radial-gradient(circle,
+                hsla(calc(var(--base-hue, 270)), 80%, 60%, 0.15) 0%,
+                transparent 50%);
+            filter: blur(8px);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Reduced motion: simplified orb */
+        @media (prefers-reduced-motion: reduce) {
+            .wrap, .nav-orb-wrap {
+                animation: none !important;
+            }
+            .c {
+                animation: none !important;
+                opacity: 0.7 !important;
+                transform: rotateZ(var(--rz)) rotateY(var(--ry)) translateX(var(--radius)) rotateZ(var(--rz-inv)) !important;
+            }
         }
 
         /* Breathing text - elegant subtitle style with soft shadow */
@@ -843,7 +892,7 @@
         /* Responsive */
         @media (max-width: 600px) {
             .navbar {
-                padding: 10px 16px;
+                padding: 10px 16px 10px 12px;
                 flex-wrap: wrap;
                 gap: 10px;
             }
@@ -1120,15 +1169,22 @@
         // ============================================
         // PARTICLE ORB CONFIGURATION
         // ============================================
-        const TOTAL_PARTICLES = 250;
+        // Mobile detection for adaptive particle count
+        const isMobile = /iPhone|iPad|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                        || window.innerWidth < 768;
+        const TOTAL_PARTICLES = isMobile ? 80 : 150;
         const ORB_SIZE = 100;
         const PARTICLE_TIME = 14;
         let baseHue = 270;
 
         // Nano orb config (exact replica, scaled down)
-        const NANO_PARTICLES = 60;
+        const NANO_PARTICLES = isMobile ? 20 : 35;
         const NANO_ORB_SIZE = 12;
         const NANO_PARTICLE_TIME = 14;
+
+        // Animation pause state
+        let isAnimationPaused = false;
+        let pauseStartTime = 0;
 
         // Scale bounds
         const SCALE_MIN = 0.5;
@@ -1230,119 +1286,89 @@
         }
 
         // ============================================
-        // PARTICLE ORB CREATION
+        // PARTICLE ORB CREATION (Optimized with CSS variables)
         // ============================================
         function createParticleOrb() {
-            const styleSheet = document.createElement('style');
-            let css = '';
-
-            // Main orb particles
-            for (let i = 1; i <= TOTAL_PARTICLES; i++) {
+            // Main orb particles - set CSS variables instead of unique keyframes
+            for (let i = 0; i < TOTAL_PARTICLES; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'c';
-                particle.id = `p${i}`;
+
+                const z = Math.random() * 360;
+                const y = Math.random() * 360;
+                const hueOffset = (40 / TOTAL_PARTICLES) * i;
+
+                // Set CSS variables for this particle
+                particle.style.setProperty('--rz', `${-z}deg`);
+                particle.style.setProperty('--rz-inv', `${z}deg`);
+                particle.style.setProperty('--ry', `${y}deg`);
+                particle.style.setProperty('--radius', `${ORB_SIZE}px`);
+                particle.style.setProperty('--duration', `${PARTICLE_TIME}s`);
+                particle.style.setProperty('--delay', `${i * 0.01}s`);
+                particle.style.setProperty('--hue-offset', hueOffset);
+
                 wrap.appendChild(particle);
-
-                const z = Math.random() * 360;
-                const y = Math.random() * 360;
-
-                css += `
-                    #wrap .c:nth-child(${i}) {
-                        animation: orbit${i} ${PARTICLE_TIME}s infinite;
-                        animation-delay: ${i * 0.01}s;
-                    }
-                    @keyframes orbit${i} {
-                        0% {
-                            opacity: 0;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(0) rotateZ(${z}deg);
-                        }
-                        15% {
-                            opacity: 1;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
-                        }
-                        100% {
-                            opacity: 1;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${ORB_SIZE}px) rotateZ(${z}deg);
-                        }
-                    }
-                `;
             }
 
-            // Nano orb particles (exact replica, scaled down)
-            for (let i = 1; i <= NANO_PARTICLES; i++) {
+            // Nano orb particles (same approach)
+            for (let i = 0; i < NANO_PARTICLES; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'c';
-                particle.id = `np${i}`;
-                navOrbWrap.appendChild(particle);
 
                 const z = Math.random() * 360;
                 const y = Math.random() * 360;
+                const hueOffset = (40 / NANO_PARTICLES) * i;
 
-                css += `
-                    #navOrbWrap .c:nth-child(${i}) {
-                        animation: nanoOrbit${i} ${NANO_PARTICLE_TIME}s infinite;
-                        animation-delay: ${i * 0.01}s;
-                    }
-                    @keyframes nanoOrbit${i} {
-                        0% {
-                            opacity: 0;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(0) rotateZ(${z}deg);
-                        }
-                        15% {
-                            opacity: 1;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${NANO_ORB_SIZE}px) rotateZ(${z}deg);
-                        }
-                        100% {
-                            opacity: 1;
-                            transform: rotateZ(${-z}deg) rotateY(${y}deg) translateX(${NANO_ORB_SIZE}px) rotateZ(${z}deg);
-                        }
-                    }
-                `;
+                particle.style.setProperty('--rz', `${-z}deg`);
+                particle.style.setProperty('--rz-inv', `${z}deg`);
+                particle.style.setProperty('--ry', `${y}deg`);
+                particle.style.setProperty('--radius', `${NANO_ORB_SIZE}px`);
+                particle.style.setProperty('--duration', `${NANO_PARTICLE_TIME}s`);
+                particle.style.setProperty('--delay', `${i * 0.01}s`);
+                particle.style.setProperty('--hue-offset', hueOffset);
+
+                navOrbWrap.appendChild(particle);
             }
-
-            styleSheet.textContent = css;
-            document.head.appendChild(styleSheet);
         }
 
         // ============================================
-        // COLOR CYCLING
+        // COLOR CYCLING (Optimized: single CSS variable update)
         // ============================================
-        function updateParticleColors() {
-            // Main orb particles
-            const mainParticles = wrap.querySelectorAll('.c');
-            mainParticles.forEach((particle, i) => {
-                const hue = (baseHue + (40 / TOTAL_PARTICLES) * i) % 360;
-                particle.style.color = `hsl(${hue}, 100%, 60%)`;
-                particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
-            });
+        let lastColorUpdate = 0;
+        const COLOR_UPDATE_INTERVAL = 50; // ms (~20 updates/sec)
 
-            // Nano orb particles (same color scheme)
-            const nanoParticles = navOrbWrap.querySelectorAll('.c');
-            nanoParticles.forEach((particle, i) => {
-                const hue = (baseHue + (40 / NANO_PARTICLES) * i) % 360;
-                particle.style.color = `hsl(${hue}, 100%, 60%)`;
-                particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
-            });
+        function updateBaseHue() {
+            // Single DOM write: update --base-hue on root element
+            // All particles automatically calculate their color via CSS calc()
+            document.documentElement.style.setProperty('--base-hue', baseHue);
 
             const hue1 = baseHue;
             const hue2 = (baseHue + 60) % 360;
 
-            // Main orb glow
+            // Update glow elements (only 2 updates instead of 370)
             orbGlow.style.background = `radial-gradient(circle,
                 hsla(${hue1}, 80%, 50%, 0.3) 0%,
                 hsla(${hue2}, 80%, 50%, 0.15) 40%,
                 transparent 70%)`;
 
-            // Nano orb glow (same colors)
             navOrbGlow.style.background = `radial-gradient(circle,
                 hsla(${hue1}, 80%, 50%, 0.4) 0%,
                 hsla(${hue2}, 80%, 50%, 0.2) 40%,
                 transparent 70%)`;
         }
 
-        function colorCycle() {
-            baseHue = (baseHue + 0.3) % 360;
-            updateParticleColors();
+        function colorCycle(timestamp) {
+            if (isAnimationPaused) {
+                requestAnimationFrame(colorCycle);
+                return;
+            }
+
+            // Throttle updates to ~20 per second
+            if (timestamp - lastColorUpdate > COLOR_UPDATE_INTERVAL) {
+                baseHue = (baseHue + 0.5) % 360;
+                updateBaseHue();
+                lastColorUpdate = timestamp;
+            }
             requestAnimationFrame(colorCycle);
         }
 
@@ -1417,6 +1443,11 @@
         }
 
         function breathingLoop(timestamp) {
+            if (isAnimationPaused) {
+                animationFrameId = requestAnimationFrame(breathingLoop);
+                return;
+            }
+
             const pattern = getPattern();
             const phase = pattern[currentPhaseIndex];
             const elapsed = timestamp - phaseStartTime;
@@ -1661,11 +1692,59 @@
         });
 
         // ============================================
+        // VISIBILITY-BASED PAUSE (Battery optimization)
+        // ============================================
+        function pauseAnimations() {
+            if (isAnimationPaused) return;
+            isAnimationPaused = true;
+            pauseStartTime = performance.now();
+            wrap.style.animationPlayState = 'paused';
+            navOrbWrap.style.animationPlayState = 'paused';
+            wrap.querySelectorAll('.c').forEach(p => p.style.animationPlayState = 'paused');
+            navOrbWrap.querySelectorAll('.c').forEach(p => p.style.animationPlayState = 'paused');
+        }
+
+        function resumeAnimations() {
+            if (!isAnimationPaused) return;
+            // Adjust phase start time to account for pause duration
+            const pauseDuration = performance.now() - pauseStartTime;
+            phaseStartTime += pauseDuration;
+            isAnimationPaused = false;
+            wrap.style.animationPlayState = 'running';
+            navOrbWrap.style.animationPlayState = 'running';
+            wrap.querySelectorAll('.c').forEach(p => p.style.animationPlayState = 'running');
+            navOrbWrap.querySelectorAll('.c').forEach(p => p.style.animationPlayState = 'running');
+        }
+
+        // Pause when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                pauseAnimations();
+            } else {
+                resumeAnimations();
+            }
+        });
+
+        // Pause when orb is off-screen (IntersectionObserver)
+        const orbContainer = document.querySelector('.orb-container');
+        const orbObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!document.hidden) resumeAnimations();
+                } else {
+                    pauseAnimations();
+                }
+            });
+        }, { threshold: 0.1 });
+
+        orbObserver.observe(orbContainer);
+
+        // ============================================
         // INITIALIZATION
         // ============================================
         createParticleOrb();
-        updateParticleColors();
-        colorCycle();
+        updateBaseHue();
+        colorCycle(0);
         setOrbScale(SCALE_MIN);
         startBreathing();
     </script>
