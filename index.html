@@ -161,27 +161,14 @@
             border-radius: 12px;
         }
 
-        .radio-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .music-select {
+            width: 150px;
         }
 
-        .radio-btn {
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .radio-btn.playing {
+        .music-select.playing {
             background: rgba(120, 200, 160, 0.12);
             border-color: rgba(120, 200, 160, 0.25);
             box-shadow: 0 0 20px -5px rgba(120, 200, 160, 0.2);
-        }
-
-        .station-select {
-            width: 130px;
         }
 
         .pattern-select {
@@ -678,8 +665,8 @@
                 padding: 6px 10px;
             }
 
-            .station-select {
-                width: 110px;
+            .music-select {
+                width: 120px;
             }
 
             .pattern-select {
@@ -794,18 +781,13 @@
         </div>
 
         <div class="nav-group">
-            <div class="radio-controls">
-                <select id="station" class="station-select" aria-label="Select music track">
-                    <option value="0">Peaceful</option>
-                    <option value="1">Soothing</option>
-                    <option value="2">Tranquil Garden</option>
-                    <option value="3">Ambient</option>
-                </select>
-                <button id="radioBtn" class="radio-btn" aria-label="Play/Stop music">
-                    <span id="radioIcon">▶</span>
-                    <span id="radioText">Play</span>
-                </button>
-            </div>
+            <select id="musicSelect" class="music-select" aria-label="Select music">
+                <option value="off">Music Off</option>
+                <option value="0">♫ Peaceful</option>
+                <option value="1">♫ Soothing</option>
+                <option value="2">♫ Tranquil</option>
+                <option value="3">♫ Ambient</option>
+            </select>
             <select id="bgSelect" class="bg-select" aria-label="Select background">
                 <option value="1">Ocean</option>
                 <option value="2">Galaxy</option>
@@ -979,10 +961,7 @@
         const countdownEl = document.getElementById('countdown');
         const patternSelect = document.getElementById('pattern');
         const themeToggle = document.getElementById('themeToggle');
-        const radioBtn = document.getElementById('radioBtn');
-        const radioIcon = document.getElementById('radioIcon');
-        const radioText = document.getElementById('radioText');
-        const stationSelect = document.getElementById('station');
+        const musicSelect = document.getElementById('musicSelect');
         const radioAudio = document.getElementById('radioAudio');
         const customPanel = document.getElementById('customPanel');
         const customInhale = document.getElementById('customInhale');
@@ -1284,32 +1263,19 @@
         // Music controls
         radioAudio.loop = true;
 
-        function toggleMusic() {
-            if (isPlaying) {
+        musicSelect.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (value === 'off') {
                 radioAudio.pause();
                 radioAudio.currentTime = 0;
                 isPlaying = false;
-                radioIcon.textContent = '▶';
-                radioText.textContent = 'Play';
-                radioBtn.classList.remove('playing');
+                musicSelect.classList.remove('playing');
             } else {
-                const trackIndex = parseInt(stationSelect.value);
+                const trackIndex = parseInt(value);
                 radioAudio.src = tracks[trackIndex];
-                radioAudio.play().catch(e => console.log('Audio play failed:', e));
+                radioAudio.play().catch(err => console.log('Audio play failed:', err));
                 isPlaying = true;
-                radioIcon.textContent = '■';
-                radioText.textContent = 'Stop';
-                radioBtn.classList.add('playing');
-            }
-        }
-
-        radioBtn.addEventListener('click', toggleMusic);
-
-        stationSelect.addEventListener('change', () => {
-            if (isPlaying) {
-                const trackIndex = parseInt(stationSelect.value);
-                radioAudio.src = tracks[trackIndex];
-                radioAudio.play().catch(e => console.log('Audio play failed:', e));
+                musicSelect.classList.add('playing');
             }
         });
 
