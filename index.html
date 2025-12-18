@@ -54,7 +54,7 @@
             overflow: hidden;
         }
 
-        /* Navbar - Premium Glassmorphism */
+        /* Navbar - Premium 3D Glassmorphism */
         .navbar {
             position: fixed;
             top: 0;
@@ -64,20 +64,48 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--nav-bg);
-            backdrop-filter: blur(40px) saturate(180%);
-            -webkit-backdrop-filter: blur(40px) saturate(180%);
-            border-bottom: 1px solid var(--nav-border);
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.08) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(0, 0, 0, 0.05) 100%
+            ), var(--nav-bg);
+            backdrop-filter: blur(50px) saturate(200%);
+            -webkit-backdrop-filter: blur(50px) saturate(200%);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
             box-shadow:
-                0 1px 0 0 var(--nav-glow) inset,
-                0 4px 24px -8px rgba(0, 0, 0, 0.3);
+                0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
+                0 -1px 0 0 rgba(0, 0, 0, 0.1) inset,
+                0 4px 16px -4px rgba(0, 0, 0, 0.25),
+                0 8px 32px -8px rgba(0, 0, 0, 0.15);
             z-index: 100;
-            opacity: 0.85;
-            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.92;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .navbar:hover {
             opacity: 1;
+            box-shadow:
+                0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+                0 -1px 0 0 rgba(0, 0, 0, 0.1) inset,
+                0 6px 20px -4px rgba(0, 0, 0, 0.3),
+                0 12px 40px -8px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="light"] .navbar {
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(255, 255, 255, 0.7) 50%,
+                rgba(240, 240, 235, 0.8) 100%
+            );
+            border-top: 1px solid rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow:
+                0 1px 0 0 rgba(255, 255, 255, 0.5) inset,
+                0 4px 16px -4px rgba(0, 0, 0, 0.1),
+                0 8px 32px -8px rgba(0, 0, 0, 0.08);
         }
 
         .nav-group {
@@ -161,7 +189,7 @@
         }
 
         .bg-select {
-            width: 70px;
+            width: 115px;
         }
 
         /* Background Image Layer */
@@ -595,7 +623,7 @@
             }
 
             .bg-select {
-                width: 60px;
+                width: 100px;
             }
 
             .custom-panel {
@@ -712,11 +740,11 @@
                 </button>
             </div>
             <select id="bgSelect" class="bg-select" aria-label="Select background">
-                <option value="none">No BG</option>
-                <option value="1">BG 1</option>
-                <option value="2">BG 2</option>
-                <option value="3">BG 3</option>
-                <option value="4">BG 4</option>
+                <option value="1">Background 1</option>
+                <option value="2">Background 2</option>
+                <option value="3">Background 3</option>
+                <option value="4">Background 4</option>
+                <option value="none">Pure Black</option>
             </select>
             <button id="silentToggle" class="theme-toggle" aria-label="Toggle silent mode" title="Silent mode">💬</button>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☀</button>
@@ -910,7 +938,7 @@
         // ============================================
         let currentPattern = localStorage.getItem('breathPattern') || 'moderate';
         let pendingPattern = null; // Pattern to apply at next cycle
-        let currentBg = localStorage.getItem('breathBg') || 'none';
+        let currentBg = localStorage.getItem('breathBg') || '1';
 
         // Load custom pattern values from localStorage
         const savedCustom = JSON.parse(localStorage.getItem('customBreathPattern') || '{"inhale":4,"hold":4,"exhale":6}');
@@ -1159,17 +1187,29 @@
         });
 
         // Background selection
+        const bgImages = {
+            '1': 'backgr/damien-dufour-TH2cSJMA4ik-unsplash.jpg',
+            '2': 'backgr/jackson-hendry-eodA_8CTOFo-unsplash.jpg',
+            '3': 'backgr/omar-ramadan-vcRHpfrsaL8-unsplash.jpg',
+            '4': 'backgr/sam-schooler-E9aetBe2w40-unsplash.jpg'
+        };
+
         function setBackground(value) {
             if (value === 'none') {
                 bgLayer.style.backgroundImage = '';
                 bgLayer.classList.remove('active');
             } else {
-                bgLayer.style.backgroundImage = `url('backgr/backgr0${value}.png')`;
+                bgLayer.style.backgroundImage = `url('${bgImages[value]}')`;
                 bgLayer.classList.add('active');
             }
             localStorage.setItem('breathBg', value);
         }
 
+        // Random background on first visit, otherwise use saved preference
+        if (!localStorage.getItem('breathBg')) {
+            // First visit - start with random background
+            currentBg = String(Math.floor(Math.random() * 4) + 1);
+        }
         bgSelect.value = currentBg;
         setBackground(currentBg);
 
