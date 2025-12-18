@@ -390,6 +390,19 @@
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
         }
 
+        .custom-inputs input.shake {
+            animation: shakeInput 0.4s ease;
+            border-color: rgba(255, 100, 100, 0.5);
+        }
+
+        @keyframes shakeInput {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
         .custom-inputs .unit {
             color: var(--text-muted);
             font-size: 12px;
@@ -1239,6 +1252,10 @@
                 <div class="changelog">
                     <div class="changelog-entry">
                         <span class="changelog-date">2025-12-18</span>
+                        <span class="changelog-text">Enforce hard limits with shake animation on violation (Inhale: 10s, Hold: 30s, Exhale: 15s)</span>
+                    </div>
+                    <div class="changelog-entry">
+                        <span class="changelog-date">2025-12-18</span>
                         <span class="changelog-text">Add Dev Updates modal with full changelog</span>
                     </div>
                     <div class="changelog-entry">
@@ -1541,11 +1558,11 @@
         let pendingPattern = null; // Pattern to apply at next cycle
         let currentBg = localStorage.getItem('breathBg') || '1';
 
-        // Load custom pattern values from localStorage
+        // Load custom pattern values from localStorage (clamped to hard limits)
         const savedCustom = JSON.parse(localStorage.getItem('customBreathPattern') || '{"inhale":4,"hold":4,"exhale":6}');
-        customInhale.value = savedCustom.inhale;
-        customHold.value = savedCustom.hold;
-        customExhale.value = savedCustom.exhale;
+        customInhale.value = Math.min(Math.max(savedCustom.inhale || 4, 1), 10);  // max 10s
+        customHold.value = Math.min(Math.max(savedCustom.hold || 0, 0), 30);      // max 30s
+        customExhale.value = Math.min(Math.max(savedCustom.exhale || 6, 1), 15);  // max 15s
         let isPlaying = false;
 
         // Animation state
@@ -1705,12 +1722,26 @@
         // ============================================
         // BREATHING SCHEDULER
         // ============================================
+        // Hard limits for custom pattern (seconds) - NEVER EXCEEDED
+        const MAX_INHALE = 10;
+        const MAX_HOLD = 30;
+        const MAX_EXHALE = 15;
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
         function getPattern() {
             if (currentPattern === 'custom') {
+                // Always clamp to hard limits as ultimate safety net
+                const inhale = clamp(parseInt(customInhale.value) || 4, 1, MAX_INHALE);
+                const hold = clamp(parseInt(customHold.value) || 0, 0, MAX_HOLD);
+                const exhale = clamp(parseInt(customExhale.value) || 6, 1, MAX_EXHALE);
+
                 return [
-                    { key: 'in', ms: parseInt(customInhale.value) * 1000 || 4000 },
-                    { key: 'hold', ms: parseInt(customHold.value) * 1000 || 0 },
-                    { key: 'out', ms: parseInt(customExhale.value) * 1000 || 6000 }
+                    { key: 'in', ms: inhale * 1000 },
+                    { key: 'hold', ms: hold * 1000 },
+                    { key: 'out', ms: exhale * 1000 }
                 ].filter(phase => phase.ms > 0); // Remove hold if 0
             }
             return patterns[currentPattern];
@@ -1794,16 +1825,50 @@
             }
         });
 
-        // Custom pattern inputs - save to localStorage on change
+        // Custom pattern inputs - HARD LIMITS (never exceeded)
+        const CUSTOM_LIMITS = {
+            inhale: { min: 1, max: 10 },
+            hold: { min: 0, max: 30 },
+            exhale: { min: 1, max: 15 }
+        };
+
+        function shakeInput(input) {
+            input.classList.remove('shake');
+            // Force reflow to restart animation
+            void input.offsetWidth;
+            input.classList.add('shake');
+            setTimeout(() => input.classList.remove('shake'), 400);
+        }
+
+        function validateAndClamp(input, limits) {
+            let value = parseInt(input.value);
+            if (isNaN(value)) value = limits.min;
+
+            if (value > limits.max) {
+                shakeInput(input);
+                input.value = limits.max;
+                return limits.max;
+            }
+            if (value < limits.min) {
+                input.value = limits.min;
+                return limits.min;
+            }
+            return value;
+        }
+
         function saveCustomPattern() {
             const custom = {
-                inhale: parseInt(customInhale.value) || 4,
-                hold: parseInt(customHold.value) || 0,
-                exhale: parseInt(customExhale.value) || 6
+                inhale: validateAndClamp(customInhale, CUSTOM_LIMITS.inhale),
+                hold: validateAndClamp(customHold, CUSTOM_LIMITS.hold),
+                exhale: validateAndClamp(customExhale, CUSTOM_LIMITS.exhale)
             };
             localStorage.setItem('customBreathPattern', JSON.stringify(custom));
         }
 
+        // Validate on input (while typing) and on change (blur)
+        customInhale.addEventListener('input', () => validateAndClamp(customInhale, CUSTOM_LIMITS.inhale));
+        customHold.addEventListener('input', () => validateAndClamp(customHold, CUSTOM_LIMITS.hold));
+        customExhale.addEventListener('input', () => validateAndClamp(customExhale, CUSTOM_LIMITS.exhale));
         customInhale.addEventListener('change', saveCustomPattern);
         customHold.addEventListener('change', saveCustomPattern);
         customExhale.addEventListener('change', saveCustomPattern);
