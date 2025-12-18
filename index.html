@@ -222,32 +222,27 @@
             box-shadow: 0 0 6px 1px currentColor;
         }
 
-        /* Breathing text - cinema subtitle style */
+        /* Breathing text - classic cinema subtitle style (Helvetica, soft yellow, thin outline) */
         .breath-text {
             position: fixed;
             bottom: 5%;
             left: 50%;
             transform: translateX(-50%);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 48px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            color: #ffffff;
+            font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 42px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: #F8E473;
             text-align: center;
             text-shadow:
-                3px 3px 0 #000,
-                -3px 3px 0 #000,
-                3px -3px 0 #000,
-                -3px -3px 0 #000,
-                0 3px 0 #000,
-                0 -3px 0 #000,
-                3px 0 0 #000,
-                -3px 0 0 #000,
-                4px 4px 0 #000,
-                -4px 4px 0 #000,
-                4px -4px 0 #000,
-                -4px -4px 0 #000,
-                5px 5px 10px rgba(0, 0, 0, 0.9);
+                1px 1px 0 #000,
+                -1px 1px 0 #000,
+                1px -1px 0 #000,
+                -1px -1px 0 #000,
+                0 1px 0 #000,
+                0 -1px 0 #000,
+                1px 0 0 #000,
+                -1px 0 0 #000;
             z-index: 10;
             pointer-events: none;
             opacity: 1;
@@ -259,25 +254,24 @@
 
         .countdown {
             display: block;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 400;
-            margin-top: 8px;
-            letter-spacing: 2px;
-            opacity: 0.85;
+            margin-top: 6px;
+            letter-spacing: 1px;
+            opacity: 0.9;
         }
 
         [data-theme="light"] .breath-text {
-            color: #ffffff;
+            color: #D4AF37;
             text-shadow:
-                2px 2px 0 #000,
-                -2px 2px 0 #000,
-                2px -2px 0 #000,
-                -2px -2px 0 #000,
-                0 2px 0 #000,
-                0 -2px 0 #000,
-                2px 0 0 #000,
-                -2px 0 0 #000,
-                3px 3px 6px rgba(0, 0, 0, 0.8);
+                1px 1px 0 #000,
+                -1px 1px 0 #000,
+                1px -1px 0 #000,
+                -1px -1px 0 #000,
+                0 1px 0 #000,
+                0 -1px 0 #000,
+                1px 0 0 #000,
+                -1px 0 0 #000;
         }
 
         /* Glow effect behind orb - JS controlled */
